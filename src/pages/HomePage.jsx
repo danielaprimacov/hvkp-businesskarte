@@ -1,10 +1,11 @@
 import HeroSection from "../components/HeroSection";
+import Services from "../components/Services";
 
 function HomePage() {
   return (
     <div className="">
       <HeroSection />
-      <p>HomePage</p>
+      <Services/>
     </div>
   );
 }
