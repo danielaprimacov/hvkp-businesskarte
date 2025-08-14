@@ -61,7 +61,7 @@ function HeroSection() {
         </div>
         <Link
           to="/"
-          className="mt-14 px-6 py-2 rounded-md text-white text-lg tracking-wider bg-blue-400 tranistion duration-300 hover:scale-110 ease-in"
+          className="mt-14 px-6 py-2 rounded-md text-white text-xl tracking-wider uppercase bg-blue-400 tranistion duration-300 hover:scale-110 ease-in"
         >
           Erfahren mehr
         </Link>
