@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-import transporBackground from "../assets/images/transport-image.avif";
+import transportBackground from "../assets/images/transport-image.avif";
 import arrowDownIcon from "../assets/icons/arrow-circle-down.png";
 import arrowsIcon from "../assets/icons/angle-double-small-right.png";
 import questionIcon from "../assets/icons/interrogation.png";
@@ -27,7 +27,7 @@ function TransportPage() {
         <motion.img
           style={{ opacity: imgOpacity, y: imgY }}
           className="absolute inset-0 h-full w-full object-cover"
-          src={transporBackground}
+          src={transportBackground}
           alt="Transport Background Image"
         />
         <div className="absolute inset-0 bg-black/30" />
@@ -68,7 +68,7 @@ function TransportPage() {
             melden uns kurzfristig mit einem Festpreis.
           </p>
 
-          <button className="mt-5 px-6 py-2 flex gap-3 rounded-md text-white text-xl tracking-wider uppercase bg-blue-400 tranistion duration-300 hover:scale-110 ease-in cursor-pointer">
+          <button className="mt-5 px-6 py-2 flex gap-3 rounded-md text-white text-xl tracking-wider uppercase bg-blue-400 transition duration-300 hover:scale-110 ease-in cursor-pointer">
             Angebot anfordern
             <img
               src={arrowsIcon}
@@ -94,7 +94,7 @@ function TransportPage() {
 
           <Link
             to="/de-montage"
-            className="mt-8 px-6 py-2 flex gap-3 rounded-md text-white tracking-wider uppercase bg-blue-400 tranistion-all duration-300 hover:shadow-lg hover:bg-blue-500 ease-in"
+            className="mt-8 px-6 py-2 flex gap-3 rounded-md text-white tracking-wider uppercase bg-blue-400 transition-all duration-300 hover:shadow-lg hover:bg-blue-500 ease-in"
           >
             Leistungsumfang ansehen
           </Link>
