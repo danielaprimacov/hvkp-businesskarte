@@ -61,7 +61,7 @@ function DeMontagePage() {
         <div className="flex flex-col justify-center items-center">
           <p className="w-[60rem] mb-10 text-3xl/13 uppercase font-bold text-center">
             Wir übernehmen Planung, (De-)Montage und Abnahme Ihres Turmdrehkrans
-            – fachgerecht und termintreu.
+            – fachgerecht und termingerecht.
           </p>
           <p className="w-[70rem] mb-10 text-center text-xl">
             Für ein schnelles Angebot senden Sie uns Kranmodell/Typ,

@@ -13,7 +13,7 @@ function Footer() {
     : pathname.startsWith("/de-montage")
     ? { to: "to-[#a48894]", h3: "text-[#a48894]" }
     : pathname.startsWith("/reparatur")
-    ? { to: "to-blue-700", h3: "text-blue-700" }
+    ? { to: "to-[#4d898a]", h3: "text-[#4d898a]" }
     : { to: "to-blue-300", h3: "text-blue-700" };
 
   return (
