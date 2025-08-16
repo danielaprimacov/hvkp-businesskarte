@@ -21,7 +21,7 @@ function Footer() {
         <ul>
           <li>
             <Link
-              to="/"
+              to="/transport"
               className="text-black/70 hover:underline hover:text-black"
             >
               Krantransporte
@@ -29,7 +29,7 @@ function Footer() {
           </li>
           <li>
             <Link
-              to="/"
+              to="/de-montage"
               className="text-black/70 hover:underline hover:text-black"
             >
               Montage & Demontage
@@ -37,7 +37,7 @@ function Footer() {
           </li>
           <li>
             <Link
-              to="/"
+              to="/reparatur"
               className="text-black/70 hover:underline hover:text-black"
             >
               Reparatur & Ersatzteile

@@ -12,7 +12,7 @@ function Services() {
       </h1>
       <div className="flex justify-evenly items-center gap-10 px-10 pb-15">
         <Link
-          to="/"
+          to="/transport"
           className="flex flex-1 flex-col border border-gray-200 rounded hover:shadow-sm transition duration-300"
         >
           <div className="flex justify-center items-center">
@@ -28,7 +28,7 @@ function Services() {
           </div>
         </Link>
         <Link
-          to="/"
+          to="/de-montage"
           className="flex flex-1 flex-col border border-gray-200 rounded hover:shadow-sm transition duration-300"
         >
           <div className="flex justify-center items-center">
@@ -44,7 +44,7 @@ function Services() {
           </div>
         </Link>
         <Link
-          to="/"
+          to="/reparatur"
           className="flex flex-1 flex-col border border-gray-200 rounded hover:shadow-sm transition duration-300"
         >
           <div className="flex justify-center items-center">

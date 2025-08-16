@@ -5,12 +5,12 @@ import Services from "../components/Services";
 
 function HomePage() {
   return (
-    <div className="">
+    <>
       <HeroSection />
       <CraneManufacturer />
       <Services />
       <ContactUs />
-    </div>
+    </>
   );
 }
 
