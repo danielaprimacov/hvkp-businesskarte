@@ -37,7 +37,7 @@ function Modal({ children, isOpen, onClose }) {
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-2xl p-10 relative`}
+        className={`bg-white rounded-2xl p-10 relative w-[min(92vw,48rem)]`}
         onClick={(e) => e.stopPropagation()}
       >
         <button

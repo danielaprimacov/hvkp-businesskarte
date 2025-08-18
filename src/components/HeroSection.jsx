@@ -72,7 +72,7 @@ function HeroSection() {
       </div>
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <OfferForm onClose={() => setIsOpen(false)} />
+        <OfferForm onClose={() => setIsOpen(false)} variant="general"/>
       </Modal>
     </>
   );
