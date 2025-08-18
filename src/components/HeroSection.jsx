@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+
+import Modal from "./ui/Modal";
+import OfferForm from "./OfferForm";
 
 import playIcon from "../assets/icons/play.png";
 import stopIcon from "../assets/icons/stop-circle.png";
@@ -9,6 +11,8 @@ import videoWebm from "../assets/video/introVideo.webm";
 function HeroSection() {
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef(null);
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const togglePlay = (event) => {
     event.stopPropagation();
@@ -59,13 +63,17 @@ function HeroSection() {
             Planung, Montage, Logistik – alles aus einer Hand
           </p>
         </div>
-        <Link
-          to="/"
-          className="mt-14 px-6 py-2 rounded-md text-white text-xl tracking-wider uppercase bg-blue-400 tranistion duration-300 hover:scale-110 ease-in"
+        <button
+          onClick={() => setIsOpen(true)}
+          className="mt-14 px-6 py-2 rounded-md text-white text-xl tracking-wider uppercase bg-blue-400 cursor-pointer tranistion duration-300 hover:scale-110 ease-in"
         >
           Angebot anfordern
-        </Link>
+        </button>
       </div>
+
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <OfferForm onClose={() => setIsOpen(false)} />
+      </Modal>
     </>
   );
 }
