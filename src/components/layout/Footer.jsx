@@ -1,12 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
 
+import MapLink from "../ui/MapLink";
+
 import facebookIcon from "../../assets/icons/facebook.png";
 import instagramIcon from "../../assets/icons/instagram.png";
-import xTwitterIcon from "../../assets/icons/twitter-alt-circle.png";
+import locationIcon from "../../assets/icons/marker.png";
 import whatsappIcon from "../../assets/icons/whatsapp.png";
 
 function Footer() {
   const { pathname } = useLocation();
+
+  const ADDRESS = "Hovekampsweg 15, 48485 Neuenkirchen, Germany";
 
   const theme = pathname.startsWith("/transport")
     ? { to: "to-blue-300", h3: "text-blue-700" }
@@ -23,36 +27,125 @@ function Footer() {
       {/* Kontakt */}
       <div className="mt-5 flex flex-col gap-0.5">
         <h3 className={`${theme.h3} uppercase`}>Adresse</h3>
-        <p className="text-black/70">Hovekampsweg 15</p>
-        <p className="text-black/70">48485 Neuenkirchen, Germany</p>
-        <p className="text-black/70">+49 1590 1212377</p>
+        <MapLink address={ADDRESS} className="group inline-block">
+          {/* Line 1 */}
+          <span className="relative block whitespace-nowrap">
+            <span aria-hidden className="invisible block font-medium leading-6">
+              Hovekampsweg 15
+            </span>
+            <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+              Hovekampsweg 15
+            </span>
+            <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+              Hovekampsweg 15
+            </span>
+          </span>
+
+          {/* Line 2 */}
+          <span className="relative block whitespace-nowrap">
+            <span aria-hidden className="invisible block font-medium leading-6">
+              48485 Neuenkirchen, Germany
+            </span>
+            <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+              48485 Neuenkirchen, Germany
+            </span>
+            <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+              48485 Neuenkirchen, Germany
+            </span>
+          </span>
+        </MapLink>
+
+        {/* Phone (click-to-call) */}
+        <a href="tel:+4915901212377" className="group inline-block">
+          <span className="relative inline-block whitespace-nowrap">
+            <span aria-hidden className="invisible block font-medium leading-6">
+              +49 1590 1212377
+            </span>
+            <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+              +49 1590 1212377
+            </span>
+            <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+              +49 1590 1212377
+            </span>
+          </span>
+        </a>
       </div>
       {/* Links */}
       <div className="mt-5 flex flex-col gap-0.5">
         <h3 className={`${theme.h3} uppercase`}>Entdecken</h3>
-        <ul>
+        <ul className="space-y-1">
           <li>
             <Link
               to="/transport"
-              className="text-black/70 hover:underline hover:text-black"
+              className="group relative inline-block whitespace-nowrap"
             >
-              Krantransporte
+              {/* sizer: reserves width/height for the widest state */}
+              <span
+                aria-hidden
+                className="invisible block font-medium leading-6"
+              >
+                Krantransporte
+              </span>
+
+              {/* normal state */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+                Krantransporte
+              </span>
+
+              {/* hover state (no layout change) */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+                Krantransporte
+              </span>
             </Link>
           </li>
+
           <li>
             <Link
               to="/de-montage"
-              className="text-black/70 hover:underline hover:text-black"
+              className="group relative inline-block whitespace-nowrap"
             >
-              Montage & Demontage
+              {/* sizer: reserves width/height for the widest state */}
+              <span
+                aria-hidden
+                className="invisible block font-medium leading-6"
+              >
+                Montage &amp; Demontage
+              </span>
+
+              {/* normal state */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+                Montage &amp; Demontage
+              </span>
+
+              {/* hover state (no layout change) */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+                Montage &amp; Demontage
+              </span>
             </Link>
           </li>
+
           <li>
             <Link
               to="/reparatur"
-              className="text-black/70 hover:underline hover:text-black"
+              className="group relative inline-block whitespace-nowrap"
             >
-              Reparatur & Ersatzteile
+              {/* sizer: reserves width/height for the widest state */}
+              <span
+                aria-hidden
+                className="invisible block font-medium leading-6"
+              >
+                Reparatur &amp; Ersatzteile
+              </span>
+
+              {/* normal state */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+                Reparatur &amp; Ersatzteile
+              </span>
+
+              {/* hover state (no layout change) */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+                Reparatur &amp; Ersatzteile
+              </span>
             </Link>
           </li>
         </ul>
@@ -60,18 +153,54 @@ function Footer() {
 
       <div className="mt-5 flex flex-col gap-0.5">
         <h3 className={`${theme.h3} uppercase`}>Kontakt & Impressum</h3>
-        <ul>
-          <li>
-            <button className="text-black/70 hover:underline hover:text-black cursor-pointer">
-              Kontaktieren Sie uns
-            </button>
-          </li>
+        <ul className="space-y-1">
           <li>
             <Link
               to="/"
-              className="text-black/70 hover:underline hover:text-black"
+              className="group relative inline-block whitespace-nowrap"
             >
-              Impressum
+              {/* sizer: reserves width/height for the widest state */}
+              <span
+                aria-hidden
+                className="invisible block font-medium leading-6"
+              >
+                Kontaktieren Sie uns
+              </span>
+
+              {/* normal state */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+                Kontaktieren Sie uns
+              </span>
+
+              {/* hover state (no layout change) */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+                Kontaktieren Sie uns
+              </span>
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/"
+              className="group relative inline-block whitespace-nowrap"
+            >
+              {/* sizer: reserves width/height for the widest state */}
+              <span
+                aria-hidden
+                className="invisible block font-medium leading-6"
+              >
+                Impressum
+              </span>
+
+              {/* normal state */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+                Impressum
+              </span>
+
+              {/* hover state (no layout change) */}
+              <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+                Impressum
+              </span>
             </Link>
           </li>
         </ul>
@@ -107,15 +236,15 @@ function Footer() {
               }}
             />
           </Link>
-          <Link to="https://x.com" target="_blank" rel="noopener noreferrer">
+          <MapLink address={ADDRESS} className="inline-block">
             <span
               className="inline-block h-8 w-8 bg-current text-black hover:text-neutral-900 transition-colors duration-300"
               style={{
-                WebkitMask: `url(${xTwitterIcon}) center / contain no-repeat`,
-                mask: `url(${xTwitterIcon}) center / contain no-repeat`,
+                WebkitMask: `url(${locationIcon}) center / contain no-repeat`,
+                mask: `url(${locationIcon}) center / contain no-repeat`,
               }}
             />
-          </Link>
+          </MapLink>
           <Link
             to="https://whatsapp.com"
             target="_blank"
