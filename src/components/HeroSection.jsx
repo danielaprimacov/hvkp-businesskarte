@@ -31,7 +31,7 @@ function HeroSection() {
 
   return (
     <>
-      <div className="relative w-full h-screen overflow-hidden">
+      <div className="relative w-full h-screen overflow-hidden" id="hero">
         <video
           className="absolute inset-0 w-full h-full object-cover blur-[1px] scale-101"
           ref={videoRef}
@@ -60,19 +60,21 @@ function HeroSection() {
         <div className="text-center text-white uppercase [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
           <p className="text-7xl tracking-widest">Hovekamp</p>
           <p className="text-3xl mt-4 tracking-wider">
-            Planung, Montage, Logistik – alles aus einer Hand
+            Planung, Montage, Logistik &ndash; alles aus einer Hand
           </p>
         </div>
         <button
           onClick={() => setIsOpen(true)}
-          className="mt-14 px-6 py-2 rounded-md text-white text-xl tracking-wider uppercase bg-blue-400 cursor-pointer tranistion duration-300 hover:scale-110 ease-in"
+          className="mt-14 px-6 py-2 rounded-md text-white text-xl tracking-wider uppercase bg-blue-400 cursor-pointer transition duration-300 hover:scale-110 ease-in"
         >
           Angebot anfordern
         </button>
       </div>
 
+      <div id="hero-after" className="h-px mt-12" aria-hidden="true" />
+
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <OfferForm onClose={() => setIsOpen(false)} variant="general"/>
+        <OfferForm onClose={() => setIsOpen(false)} variant="general" />
       </Modal>
     </>
   );

@@ -22,7 +22,7 @@ function Footer() {
 
   return (
     <div
-      className={`py-10 px-3 mt-5 bg-gradient-to-b from-white ${theme.to} flex justify-between`}
+      className={`p-10 mt-5 bg-gradient-to-b from-white ${theme.to} flex justify-between`}
     >
       {/* Kontakt */}
       <div className="mt-5 flex flex-col gap-0.5">
@@ -156,7 +156,7 @@ function Footer() {
         <ul className="space-y-1">
           <li>
             <Link
-              to="/"
+              to="/kontakt"
               className="group relative inline-block whitespace-nowrap"
             >
               {/* sizer: reserves width/height for the widest state */}
@@ -207,7 +207,7 @@ function Footer() {
       </div>
 
       {/* Social Media */}
-      <div className="mt-5 flex flex-col">
+      <div className="mt-5 flex flex-col mr-2">
         <h3 className={`${theme.h3} uppercase mb-7`}>Social Media</h3>
         <div className="flex justify-between gap-10">
           <Link

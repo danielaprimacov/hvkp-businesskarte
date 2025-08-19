@@ -33,7 +33,7 @@ function ContactPage() {
               eine E-Mail.
             </p>
           </div>
-          <div className="flex justify-between px-40">
+          <div className="flex justify-between px-40 mb-10">
             <div>
               <div>
                 {" "}

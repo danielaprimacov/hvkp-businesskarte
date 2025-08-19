@@ -41,7 +41,7 @@ function Navbar() {
 
   return (
     <nav
-      className={`fixed inset-x-0 h-14 z-50 px-3 ${
+      className={`fixed inset-x-0 h-14 z-50 px-5 ${
         showNav ? "top-0" : "-top-16"
       } transition-all duration-600 ease-out overflow-visible`}
     >
