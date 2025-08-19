@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import PublicLayout from "./components/layout/PublicLayout";
+import ContactPage from "./pages/ContactPage";
 import DeMontagePage from "./pages/DeMontagePage";
 import HomePage from "./pages/HomePage";
 import ReparaturPage from "./pages/ReparaturPage";
@@ -15,6 +16,7 @@ function App() {
           <Route path="/transport" element={<TransportPage />} />
           <Route path="/de-montage" element={<DeMontagePage />} />
           <Route path="/reparatur" element={<ReparaturPage />} />
+          <Route path="/kontakt" element={<ContactPage />} />
         </Route>
       </Routes>
     </>

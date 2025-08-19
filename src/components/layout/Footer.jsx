@@ -22,7 +22,7 @@ function Footer() {
 
   return (
     <div
-      className={`p-10 mt-5 bg-gradient-to-b from-white ${theme.to} flex justify-between`}
+      className={`py-10 px-3 mt-5 bg-gradient-to-b from-white ${theme.to} flex justify-between`}
     >
       {/* Kontakt */}
       <div className="mt-5 flex flex-col gap-0.5">

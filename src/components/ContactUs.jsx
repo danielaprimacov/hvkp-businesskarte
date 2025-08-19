@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import headOfTheCompanyImg from "../assets/images/boss.jpg";
 
 function ContactUs() {
@@ -22,9 +24,12 @@ function ContactUs() {
           <p className="text-blue-700 my-5">
             Sind Sie bereit, Ihr nächstes Projekt zu besprechen?
           </p>
-          <button className="py-5 px-10 rounded-md bg-blue-700 text-white text-lg tracking-wider cursor-pointer transition duration-300 hover:bg-blue-600 hover:scale-105">
+          <Link
+            to="/kontakt"
+            className="py-5 px-10 rounded-md bg-blue-700 text-white text-lg tracking-wider cursor-pointer transition duration-300 hover:bg-blue-600 hover:scale-105"
+          >
             Kontaktieren Sie uns
-          </button>
+          </Link>
         </section>
       </div>
     </div>
