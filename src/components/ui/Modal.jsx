@@ -33,20 +33,20 @@ function Modal({ children, isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4"
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-2xl p-10 relative w-[min(92vw,48rem)]`}
+        className="bg-white rounded-2xl p-6 sm:p-8 md:p-10 relative w-[min(92vw,48rem)]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute cursor-pointer top-4 right-4 text-2xl hover:text-gray-500 focus:outline-none focus:ring-0"
+          className="absolute cursor-pointer top-3 sm:top-4 right-3 sm:right-4 text-2xl hover:text-gray-500 focus:outline-none"
+          aria-label="Close modal"
         >
           &times;
         </button>
-
         {children}
       </div>
     </div>

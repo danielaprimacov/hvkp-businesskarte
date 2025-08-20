@@ -17,12 +17,12 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export function OsmMap({ lat, lng }) {
   return (
-    <div className="w-[700px] rounded-lg overflow-hidden shadow">
+    <div className="w-full max-w-[700px] rounded-lg overflow-hidden shadow">
       <MapContainer
         center={[lat, lng]}
         zoom={16}
         scrollWheelZoom={false}
-        className="h-[200px] w-full"
+        className="h-56 sm:h-64 md:h-[300px] w-full"
       >
         <TileLayer
           attribution="&copy; OpenStreetMap contributors"

@@ -153,11 +153,14 @@ function OfferForm({ onClose, variant = "general" }) {
   };
 
   const fieldClass = (hasErr) =>
-    `peer block w-full h-12 bg-transparent border-b transition focus:outline-none ${
-      hasErr
-        ? "border-red-500 focus:border-red-600"
-        : "border-b-black/20 focus:border-black"
-    }`;
+    `peer block w-full h-12 bg-transparent border-b text-base
+     focus:outline-none focus:ring-0
+     transition
+     ${
+       hasErr
+         ? "border-red-500 focus:border-red-600"
+         : "border-b-black/20 focus:border-black"
+     }`;
 
   // flags
   const isGeneral = variant === "general";
@@ -168,18 +171,18 @@ function OfferForm({ onClose, variant = "general" }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col w-full mx-auto mt-4 space-y-4"
+      className="flex flex-col w-full mx-auto mt-2 sm:mt-4 space-y-3 sm:space-y-4"
     >
-      <h2 className="mb-5 text-2xl font-bold text-center tracking-widest">
+      <h2 className="mb-2 sm:mb-5 text-xl sm:text-2xl font-bold text-center tracking-widest">
         {TITLES[variant]}
       </h2>
 
       {success && <p className="text-green-600 text-center">{success}</p>}
       {error && <p className="text-red-600 text-center">{error}</p>}
 
-      <div className="grid grid-cols-2 gap-6">
-        {/* Name */}
-        <div className="relative mb-4">
+      {/* Name / Email */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <div className="relative">
           <input
             id="name"
             name="name"
@@ -187,11 +190,13 @@ function OfferForm({ onClose, variant = "general" }) {
             onChange={handleChange}
             required
             placeholder=" "
-            className={fieldClass(errors.name)} // includes 'peer'
+            aria-invalid={!!errors.name}
+            className={fieldClass(errors.name)}
           />
           <label
             htmlFor="name"
-            className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+            className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                       peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
           >
             Name *
           </label>
@@ -200,8 +205,7 @@ function OfferForm({ onClose, variant = "general" }) {
           )}
         </div>
 
-        {/* Email */}
-        <div className="relative mb-4">
+        <div className="relative">
           <input
             id="email"
             name="email"
@@ -210,11 +214,13 @@ function OfferForm({ onClose, variant = "general" }) {
             onChange={handleChange}
             required
             placeholder=" "
+            aria-invalid={!!errors.email}
             className={fieldClass(errors.email)}
           />
           <label
             htmlFor="email"
-            className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+            className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                       peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
           >
             Email *
           </label>
@@ -224,8 +230,8 @@ function OfferForm({ onClose, variant = "general" }) {
         </div>
       </div>
 
-      {/* Phone (optional) */}
-      <div className="relative mb-8">
+      {/* Phone */}
+      <div className="relative">
         <input
           id="phone"
           name="phone"
@@ -236,14 +242,15 @@ function OfferForm({ onClose, variant = "general" }) {
         />
         <label
           htmlFor="phone"
-          className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+          className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                     peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
         >
           Telefonnummer
         </label>
       </div>
 
-      {/* Nachricht */}
-      {!isRepair && (
+      {/* Nachricht / Problembeschreibung */}
+      {!isRepair ? (
         <div className="relative">
           <textarea
             id="message"
@@ -259,7 +266,8 @@ function OfferForm({ onClose, variant = "general" }) {
           />
           <label
             htmlFor="message"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+            className="mt-2 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                       peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
           >
             Ihre Nachricht{isGeneral ? " *" : ""}
           </label>
@@ -267,10 +275,7 @@ function OfferForm({ onClose, variant = "general" }) {
             <p className="mt-1 text-sm text-red-600">{errors.message}</p>
           )}
         </div>
-      )}
-
-      {/* Repair: problem description instead of Nachricht */}
-      {isRepair && (
+      ) : (
         <div className="relative">
           <textarea
             id="problemDescription"
@@ -286,7 +291,8 @@ function OfferForm({ onClose, variant = "general" }) {
           />
           <label
             htmlFor="problemDescription"
-            className="absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+            className="mt-2 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                       peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
           >
             Problembeschreibung *
           </label>
@@ -299,7 +305,7 @@ function OfferForm({ onClose, variant = "general" }) {
       )}
 
       {(isTransport || isMontage || isRepair) && (
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="relative">
             <input
               id="craneModel"
@@ -312,7 +318,8 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="craneModel"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Kranmodell/Typ *
             </label>
@@ -320,6 +327,7 @@ function OfferForm({ onClose, variant = "general" }) {
               <p className="mt-1 text-sm text-red-600">{errors.craneModel}</p>
             )}
           </div>
+
           <div className="relative">
             <input
               id="craneManufacturers"
@@ -332,7 +340,8 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="craneManufacturers"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Kranhersteller *
             </label>
@@ -342,6 +351,7 @@ function OfferForm({ onClose, variant = "general" }) {
               </p>
             )}
           </div>
+
           <div className="relative">
             <input
               id="constructionYear"
@@ -361,7 +371,8 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="constructionYear"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Baujahr *
             </label>
@@ -375,7 +386,7 @@ function OfferForm({ onClose, variant = "general" }) {
       )}
 
       {isTransport && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div className="relative">
             <input
               id="pickupAddress"
@@ -388,7 +399,8 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="pickupAddress"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Abholadresse *
             </label>
@@ -398,6 +410,7 @@ function OfferForm({ onClose, variant = "general" }) {
               </p>
             )}
           </div>
+
           <div className="relative">
             <input
               id="destinationAddress"
@@ -410,7 +423,8 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="destinationAddress"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Zieladresse *
             </label>
@@ -436,7 +450,8 @@ function OfferForm({ onClose, variant = "general" }) {
           />
           <label
             htmlFor="siteAddress"
-            className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+            className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                       peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
           >
             Baustellenadresse *
           </label>
@@ -455,10 +470,9 @@ function OfferForm({ onClose, variant = "general" }) {
             </p>
           </div>
 
-          {/* Dimensions: Höhe / Breite / Länge */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Höhe */}
-            <div className="relative mb-2">
+          {/* Höhe / Breite / Länge */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="relative">
               <input
                 name="heightOfTheConstruction"
                 type="number"
@@ -471,11 +485,11 @@ function OfferForm({ onClose, variant = "general" }) {
                 inputMode="decimal"
                 className={`${fieldClass(
                   errors.heightOfTheConstruction
-                )} peer appearance-none`}
+                )} appearance-none`}
               />
               <label
                 className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                      peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+                           peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
               >
                 Höhe (m) *
               </label>
@@ -486,8 +500,7 @@ function OfferForm({ onClose, variant = "general" }) {
               )}
             </div>
 
-            {/* Breite */}
-            <div className="relative mb-2">
+            <div className="relative">
               <input
                 name="widthOfTheConstruction"
                 type="number"
@@ -500,11 +513,11 @@ function OfferForm({ onClose, variant = "general" }) {
                 inputMode="decimal"
                 className={`${fieldClass(
                   errors.widthOfTheConstruction
-                )} peer appearance-none`}
+                )} appearance-none`}
               />
               <label
                 className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                      peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+                           peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
               >
                 Breite (m) *
               </label>
@@ -515,8 +528,7 @@ function OfferForm({ onClose, variant = "general" }) {
               )}
             </div>
 
-            {/* Länge */}
-            <div className="relative mb-2">
+            <div className="relative">
               <input
                 name="lengthOfTheConstruction"
                 type="number"
@@ -529,11 +541,11 @@ function OfferForm({ onClose, variant = "general" }) {
                 inputMode="decimal"
                 className={`${fieldClass(
                   errors.lengthOfTheConstruction
-                )} peer appearance-none`}
+                )} appearance-none`}
               />
               <label
-                className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 
-                          peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+                className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
+                           peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
               >
                 Länge (m) *
               </label>
@@ -549,7 +561,7 @@ function OfferForm({ onClose, variant = "general" }) {
 
       {isGeneral && (
         <>
-          <label className="mt-2 inline-flex items-center gap-3 select-none">
+          <label className="mt-1 inline-flex items-center gap-3 select-none">
             <input
               type="checkbox"
               name="carport"
@@ -560,7 +572,6 @@ function OfferForm({ onClose, variant = "general" }) {
             <span className="text-sm text-gray-700">Carport / Garage</span>
           </label>
 
-          {/* Nearby trees */}
           <label className="inline-flex items-center gap-3 select-none">
             <input
               type="checkbox"
@@ -576,19 +587,20 @@ function OfferForm({ onClose, variant = "general" }) {
         </>
       )}
 
-      <div className="flex justify-end gap-4 pt-4">
+      {/* Buttons for small screen wider */}
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-2 sm:pt-4">
         <button
           type="button"
           onClick={onClose}
           disabled={submitting}
-          className="px-4 py-2 cursor-pointer rounded border hover:bg-gray-100 transition duration-300"
+          className="w-full sm:w-auto px-4 py-3 sm:py-2 cursor-pointer rounded border hover:bg-gray-100 transition duration-300"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={submitting}
-          className="bg-black text-white cursor-pointer py-2 px-4 rounded uppercase hover:bg-blue-600 transition duration-300"
+          className="w-full sm:w-auto bg-black text-white cursor-pointer py-3 sm:py-2 px-4 rounded uppercase hover:bg-blue-600 transition duration-300"
         >
           {submitting ? "Sending…" : "Send"}
         </button>

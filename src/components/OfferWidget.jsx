@@ -48,14 +48,15 @@ function OfferWidget() {
   return (
     <>
       <div
-        className={`px-2 fixed bottom-10 right-5 z-[1200] flex items-center bg-red-600/40 text-white rounded-full shadow-lg hover:bg-red-600 transition-opacity duration-300 ease-in ${
+        className={`fixed z-[1200] right-3 sm:right-4 md:right-5 bottom-3 sm:bottom-5 md:bottom-10 px-1.5 sm:px-2 rounded-full shadow-lg bg-red-600/40 hover:bg-red-600 text-white flex items-center transition-opacity duration-200 sm:duration-300 ease-in${
           visible ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         aria-hidden={!visible}
       >
         <button
           onClick={() => setIsOpen(true)}
-          className="px-4 py-2 text-sm font-medium cursor-pointer"
+          className="px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base font-medium cursor-pointer rounded-full focus:outline-none focus-visible:ring focus-visible:ring-white/60"
         >
           Angebot anfordern
         </button>
