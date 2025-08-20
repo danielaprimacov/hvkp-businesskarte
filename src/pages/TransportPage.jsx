@@ -98,7 +98,7 @@ function TransportPage() {
               />
             </button>
           </div>
-          <div className="mt-12 sm:mt-16 md:mt-20 mx-4 md:mx-20 lg:mx-40 px-3 sm:px-4 py-5 flex flex-col items-center border border-[#a48894] rounded-lg">
+          <div className="mt-12 sm:mt-16 md:mt-20 mx-4 md:mx-20 lg:mx-40 px-3 sm:px-4 py-5 flex flex-col items-center border border-blue-400 rounded-lg">
             <div className="flex items-center gap-3 sm:gap-5">
               <img
                 src={questionIcon}
@@ -119,7 +119,7 @@ function TransportPage() {
 
             <Link
               to="/de-montage"
-              className="mmt-6 sm:mt-8 px-5 sm:px-6 py-2 flex gap-2 sm:gap-3 rounded-md text-white text-sm sm:text-base tracking-wider uppercase bg-[#a48894] transition-all duration-300 hover:shadow-lg hover:bg-[#7c5e74] ease-in"
+              className="mt-6 sm:mt-8 px-5 sm:px-6 py-2 flex gap-2 sm:gap-3 rounded-md text-white text-sm sm:text-base tracking-wider uppercase bg-blue-400 transition-all duration-300 hover:shadow-lg hover:bg-[#7c5e74] ease-in"
             >
               Leistungsumfang ansehen
             </Link>

@@ -87,7 +87,7 @@ function ReparaturPage() {
 
             <button
               onClick={() => setIsOpen(true)}
-              className="mt-2 sm:mt-3 md:mt-5 px-5 sm:px-6 py-2 flex gap-2 sm:gap-3 rounded-md text-white text-base sm:text-lg md:text-xl tracking-wider uppercase bg-[#a48894] transition duration-300 hover:scale-110 ease-in cursor-pointer"
+              className="mt-2 sm:mt-3 md:mt-5 px-5 sm:px-6 py-2 flex gap-2 sm:gap-3 rounded-md text-white text-base sm:text-lg md:text-xl tracking-wider uppercase bg-[#4d898a] transition duration-300 hover:scale-110 ease-in cursor-pointer"
             >
               Angebot anfordern
               <img
