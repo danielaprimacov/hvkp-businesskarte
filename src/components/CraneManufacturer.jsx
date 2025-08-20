@@ -18,7 +18,7 @@ function CraneManufacturer() {
   const [duration, setDuration] = useState(NORMAL);
 
   return (
-    <div className="py-15 relative overflow-hidden">
+    <div className="pb-15 relative overflow-hidden">
       <h1 className="my-15 text-4xl uppercase font-medium text-center tracking-widest">
         Unsere Kranmarken
       </h1>

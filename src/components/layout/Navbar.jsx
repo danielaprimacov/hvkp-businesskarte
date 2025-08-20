@@ -41,24 +41,24 @@ function Navbar() {
 
   return (
     <nav
-      className={`fixed inset-x-0 h-14 z-50 px-5 ${
+      className={`fixed inset-x-0 h-14 z-50 pt-[env(safe-area-inset-top)] px-3 sm:px-5 ${
         showNav ? "top-0" : "-top-16"
-      } transition-all duration-600 ease-out overflow-visible`}
+      } transition-all duration-500 ease-out overflow-visible`}
     >
       <div className="w-full h-full flex items-center justify-between">
         <div>
           <img
-            className="w-6 cursor-pointer"
+            className="w-6 sm:w-7 cursor-pointer"
             src={menuIcon}
             alt="Menu Burger"
           />
         </div>
         <Link to="/">
-          <img className="w-24 cursor-pointer" src={logo} alt="Logo" />
+          <img className="w-24 sm:w-24 cursor-pointer" src={logo} alt="Logo" />
         </Link>
         <Link to="/">
           <img
-            className="w-6 cursor-pointer"
+            className="w-6 sm:w-7 cursor-pointer"
             src={AdminIcon}
             alt="Profile Icon"
           />
