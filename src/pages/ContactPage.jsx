@@ -28,7 +28,7 @@ function ContactPage() {
       {/* Intro */}
       <section>
         <div className="flex flex-col justify-center items-center px-4 sm:px-6">
-          <p className="mb-6 sm:mb-8 md:mb-10 text-lg sm:text-xl md:text-2xl uppercase font-medium tracking-wider text-center">
+          <p className="m-6 sm:m-8 md:m-10 text-lg sm:text-xl md:text-2xl uppercase font-medium tracking-wider text-center">
             Haben Sie Fragen zu unserem Angeboten oder wünschen Sie ein
             individuelles Angebot?
           </p>
