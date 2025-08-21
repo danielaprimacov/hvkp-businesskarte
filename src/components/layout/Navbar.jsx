@@ -20,6 +20,10 @@ function Navbar() {
   const lastScrollY = useRef(0);
 
   useEffect(() => {
+    if (menuOpen) closeMenu(); // guard inside closeMenu prevents the bug
+  }, [location.pathname]);
+
+  useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
       const heroBottom = window.innerHeight; // height of the hero on home
@@ -65,6 +69,7 @@ function Navbar() {
   };
 
   const closeMenu = () => {
+    if (!menuOpen) return; // do nothing if already closed
     setClosing(true); // tell icon to stay as ✕ until exit finishes
     setMenuOpen(false);
   };
@@ -117,7 +122,7 @@ function Navbar() {
             <button
               onClick={() => (menuOpen ? closeMenu() : openMenu())}
               aria-label={iconShowsClose ? "Menü schließen" : "Menü öffnen"}
-              className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7"
+              className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 cursor-pointer"
             >
               <AnimatePresence initial={false} mode="wait">
                 {iconShowsClose ? (
@@ -147,7 +152,7 @@ function Navbar() {
             </button>
           </div>
 
-          <Link to="/" onClick={closeMenu}>
+          <Link to="/" onClick={menuOpen ? closeMenu : undefined}>
             <img
               className="w-24 sm:w-24 cursor-pointer"
               src={logo}
@@ -155,7 +160,7 @@ function Navbar() {
             />
           </Link>
 
-          <Link to="/" onClick={closeMenu}>
+          <Link to="/" onClick={menuOpen ? closeMenu : undefined}>
             <img
               className="w-6 sm:w-7 cursor-pointer"
               src={AdminIcon}
