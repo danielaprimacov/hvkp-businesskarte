@@ -177,7 +177,7 @@ function Navbar() {
             {/* Backdrop */}
             <motion.div
               key="backdrop"
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[2000]"
               onClick={closeMenu}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -189,7 +189,7 @@ function Navbar() {
             {/* Drawer */}
             <motion.aside
               key="drawer"
-              className="fixed top-0 left-0 h-full w-[18rem] bg-white shadow-lg z-50 p-6 overflow-auto"
+              className="fixed top-0 left-0 h-full w-[18rem] bg-white shadow-lg z-[2010] p-6 overflow-auto"
               variants={drawerVariants}
               initial="hidden"
               animate="visible"
