@@ -31,7 +31,7 @@ function TransportPage() {
       <div ref={containerRef} className="relative">
         <section
           ref={sectionRef}
-          className="relative h-[100svh] md:h-screen overflow-hidden"
+          className="relative h-screen h-[100dvh] h-[100svh] md:h-screen overflow-hidden"
         >
           <motion.img
             style={{ opacity: imgOpacity, y: imgY }}
@@ -82,8 +82,8 @@ function TransportPage() {
             </p>
             <p className="w-full max-w-4xl md:max-w-[70rem] mb-8 sm:mb-10 text-center text-base sm:text-lg md:text-xl px-1">
               Für ein schnelles Angebot senden Sie uns Maße/Gewichte der
-              Komponenten, Abhol- und Zieladresse sowie Ihr Zeitfenster – wir
-              melden uns kurzfristig mit einem Festpreis.
+              Komponenten, Abhol- und Zieladresse sowie Ihr Zeitfenster &ndash;
+              wir melden uns kurzfristig mit einem Festpreis.
             </p>
 
             <button
@@ -112,7 +112,7 @@ function TransportPage() {
 
             <p className="max-w-3xl sm:max-w-4xl w-full mt-4 sm:mt-5 text-center text-sm sm:text-base">
               Unser Team übernimmt die komplette Montage und Demontage Ihres
-              Turmdrehkrans – von der Planung und Baustellenlogistik über
+              Turmdrehkrans &ndash; von der Planung und Baustellenlogistik über
               Ballastierung und Elektroanschluss bis zur sicheren Abnahme.
               Kurzfristige Termine möglich.
             </p>

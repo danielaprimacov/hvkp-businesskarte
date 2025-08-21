@@ -29,7 +29,7 @@ function ReparaturPage() {
       <div ref={containerRef} className="relative">
         <section
           ref={sectionRef}
-          className="relative h-[100svh] md:h-screen overflow-hidden"
+          className="relative h-screen h-[100dvh] h-[100svh] md:h-screen overflow-hidden"
         >
           <motion.img
             style={{ opacity: imgOpacity, y: imgY }}
@@ -43,7 +43,7 @@ function ReparaturPage() {
           <div className="relative z-10 mx-auto max-w-6xl px-4 h-full flex items-center">
             <motion.div style={{ opacity: textOpacity }} className="text-white">
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-wider">
-                Reparatur & Ersatzteile
+                Reparatur &amp; Ersatzteile
               </h1>
               <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-blue-50 bg-black/60 px-4 sm:px-8 md:px-10 py-2 sm:py-3 rounded">
                 Fehlersuche, Reparatur und Service sowie Ersatzteilbeschaffung
@@ -81,7 +81,7 @@ function ReparaturPage() {
             <p className="w-full max-w-4xl md:max-w-[70rem] mb-8 sm:mb-10 text-center text-base sm:text-lg md:text-xl px-1">
               Für ein schnelles Angebot senden Sie uns Kranmodell/Typ,
               Seriennummer, Fehlerbild (kurze Beschreibung/Fotos), Standort
-              sowie Ihr Zeitfenster – wir melden uns kurzfristig mit einem
+              sowie Ihr Zeitfenster &ndash; wir melden uns kurzfristig mit einem
               Festpreis.
             </p>
 

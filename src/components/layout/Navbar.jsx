@@ -17,23 +17,31 @@ function Navbar() {
     const handleScroll = () => {
       const currentY = window.scrollY;
       const heroBottom = window.innerHeight; // height of the hero on home
+      const DELTA = 6; // ignore tiny scroll jitter (iOS bounce)
+      const TOP_LOCK = 8; // always show when very top is reached
 
       // on home: always show while over hero
       if (isHome && currentY <= heroBottom) {
-        setShowNavbar(true);
+        setShowNav(true);
       } else {
-        // otherwise (either scrolled past hero on home, or any scroll on other pages)
-        if (currentY > lastScrollY.current) {
-          // scrolled down
+        // Elsewhere (or below hero on home): hide on scroll down, show on scroll up
+        if (currentY <= TOP_LOCK) {
+          // At the very top: always show (prevents disappearing on iOS overscroll)
+          setShowNav(true);
+        } else if (currentY - lastScrollY.current > DELTA) {
+          // Scrolling down noticeably
           setShowNav(false);
-        } else {
-          // scrolled up
+        } else if (lastScrollY.current - currentY > DELTA) {
+          // Scrolling up noticeably
           setShowNav(true);
         }
       }
 
       lastScrollY.current = currentY;
     };
+
+    // Set initial state correctly on mount
+    handleScroll();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);

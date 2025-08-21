@@ -32,7 +32,7 @@ function DeMontagePage() {
         {/* HERO */}
         <section
           ref={sectionRef}
-          className="relative h-[100svh] md:h-screen overflow-hidden"
+          className="relative h-screen h-[100dvh] h-[100svh] md:h-screen overflow-hidden"
         >
           <motion.img
             style={{ opacity: imgOpacity, y: imgY }}
@@ -83,12 +83,12 @@ function DeMontagePage() {
           <div className="flex flex-col justify-center items-center px-4">
             <p className="w-full max-w-3xl sm:max-w-4xl md:max-w-[60rem] mb-6 sm:mb-8 md:mb-10 text-2xl sm:text-3xl md:text-3xl/13 uppercase font-bold text-center">
               Wir übernehmen Planung, (De-)Montage und Abnahme Ihres
-              Turmdrehkrans – fachgerecht und termingerecht.
+              Turmdrehkrans &ndash; fachgerecht und termingerecht.
             </p>
             <p className="w-full max-w-4xl md:max-w-[70rem] mb-8 sm:mb-10 text-center text-base sm:text-lg md:text-xl px-1">
               Für ein schnelles Angebot senden Sie uns Kranmodell/Typ,
               Baustellenadresse, Zugänglichkeit (Autokran-/Stellfläche), ggf.
-              Auslegerlänge/Ballast sowie Ihr Zeitfenster – wir melden uns
+              Auslegerlänge/Ballast sowie Ihr Zeitfenster &ndash; wir melden uns
               kurzfristig mit einem Festpreis.
             </p>
 
@@ -119,8 +119,8 @@ function DeMontagePage() {
 
             <p className="max-w-3xl sm:max-w-4xl w-full mt-4 sm:mt-5 text-center text-sm sm:text-base">
               Planung, Koordination der Fahrzeuge und Begleitfahrzeuge,
-              abgestimmte Zeitfenster und zuverlässige Zustellung – alles aus
-              einer Hand. Kurzfristige Einsätze möglich.
+              abgestimmte Zeitfenster und zuverlässige Zustellung &ndash; alles
+              aus einer Hand. Kurzfristige Einsätze möglich.
             </p>
 
             <Link
