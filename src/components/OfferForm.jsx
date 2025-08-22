@@ -134,11 +134,12 @@ function OfferForm({ onClose, variant = "general" }) {
     return () => clearTimeout(t); // cleanup if unmounted
   }, [success, onClose]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
     setSuccess("");
     setError("");
+
     const v = validate(form);
     setErrors(v);
     if (Object.keys(v).length) {
@@ -146,10 +147,25 @@ function OfferForm({ onClose, variant = "general" }) {
       setSubmitting(false);
       return;
     }
-    // Here submit form
-    setSuccess("Vielen Dank! Wir melden uns kurzfristig mit einem Festpreis.");
-    setForm(initialState);
-    setSubmitting(false);
+
+    try {
+      const res = await fetch("/api/send-offer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ form, variant }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+
+      setSuccess(
+        "Vielen Dank! Wir melden uns kurzfristig mit einem Festpreis."
+      );
+      setForm(initialState);
+    } catch (e) {
+      console.error(e);
+      setError("Senden fehlgeschlagen. Bitte versuchen Sie es erneut.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const fieldClass = (hasErr) =>
