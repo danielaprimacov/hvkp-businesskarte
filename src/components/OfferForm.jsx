@@ -149,7 +149,7 @@ function OfferForm({ onClose, variant = "general" }) {
     }
 
     try {
-      const res = await fetch("/api/send-offer", {
+      const res = await fetch("/.netlify/functions/send-offer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ form, variant }),
