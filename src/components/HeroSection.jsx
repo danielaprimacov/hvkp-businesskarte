@@ -12,6 +12,8 @@ import videoWebm from "../assets/video/introVideo.webm";
 
 function HeroSection() {
   const { content } = useContent();
+  const title = content.pages.home.heroSection.title;
+  const subtitle = content.pages.home.heroSection.subTitle;
 
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef(null);
@@ -67,10 +69,10 @@ function HeroSection() {
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4">
         <div className="text-center text-white uppercase [text-shadow:2px_2px_4px_rgba(0,0,0,0.6)]">
           <p className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-widest">
-            {content.heroTitle}
+            {title}
           </p>
           <p className="text-base sm:text-xl md:text-2xl lg:text-3xl mt-3 sm:mt-4 tracking-wider">
-            {content.heroSubtitle}
+            {subtitle}
           </p>
         </div>
         <button

@@ -1,8 +1,15 @@
 import { Link } from "react-router-dom";
 
+import { useContent } from "../content/content";
+
 import headOfTheCompanyImg from "../assets/images/boss.jpg";
 
 function ContactUs() {
+  const { content } = useContent();
+  const text = content.pages.home.contactSection.text;
+  const paragraph = content.pages.home.contactSection.paragraph;
+  const question = content.pages.home.contactSection.question;
+
   return (
     <div className="pt-5">
       <div className="px-4 sm:px-6 md:px-10 pb-12 md:pb-30 flex flex-col md:flex-row md:justify-evenly items-center md:items-center gap-6 sm:gap-8 md:gap-10">
@@ -14,16 +21,11 @@ function ContactUs() {
         />
         <section className="flex flex-col justify-center items-center gap-4 sm:gap-5 text-center">
           <div className="w-full max-w-[38rem] md:w-150 text-base sm:text-lg md:text-xl text-black/70">
-            Von Reparatur bis Montagen, wir haben den kompletten Service rund um
-            ihren Turmdrehkran. Sie suchen eine Kran zum Kauf oder zur Miete
-            oder einfach nur Ersatzteile?
-            <div className="pt-5">
-              Fragen Sie bei uns an. Wir haben fast immer das passende Angebot
-              für Sie und können auch kurzfristig helfen.
-            </div>
+            {text}
+            <div className="pt-5">{paragraph}</div>
           </div>
           <p className="text-blue-700 my-4 sm:my-5 text-base sm:text-lg">
-            Sind Sie bereit, Ihr nächstes Projekt zu besprechen?
+            {question}
           </p>
           <Link
             to="/kontakt"

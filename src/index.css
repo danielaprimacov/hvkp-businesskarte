@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-@keyframes scroll {
-  0% {
+@keyframes marquee-x {
+  from {
     transform: translateX(0);
   }
-  100% {
-    transform: translateX(-50%);
+  to {
+    transform: translateX(calc(-1 * var(--track-w, 0px)));
   }
 }

@@ -1,14 +1,21 @@
 import { Link } from "react-router-dom";
 
+import { useContent } from "../content/content";
+
 import transportImg from "../assets/images/transport-crane.webp";
 import montageDemontageImg from "../assets/images/montage-demontage-crane.webp";
 import reparaturImg from "../assets/images/reparatur-crane.webp";
 
 function Services() {
+  const { content } = useContent();
+  const title = content.pages.home.servicesSection.title;
+  const servicesTitle = content.pages.home.servicesSection.serviceTitle;
+  const servicesSubtitle = content.pages.home.servicesSection.serviceSubtitle;
+
   return (
     <div className="py-10 sm:py-12 md:py-15">
       <h1 className="mb-8 sm:mb-10 md:mb-15 text-2xl sm:text-3xl md:text-4xl uppercase font-medium text-center tracking-widest">
-        Unsere Leistungen
+        {title}
       </h1>
       <div className="flex flex-col md:flex-row md:justify-evenly items-stretch md:items-start gap-6 sm:gap-8 md:gap-10 px-4 sm:px-6 md:px-10 pb-10 md:pb-15">
         <Link
@@ -26,10 +33,10 @@ function Services() {
           <div className="text-center py-8 sm:py-10 md:py-15">
             <div className="min-h-[3.5rem] md:min-h-[2.75rem] flex items-center justify-center">
               <h2 className="text-lg sm:text-xl tracking-wider">
-                Krantransporte
+                {servicesTitle[0]}
               </h2>
             </div>
-            <p className="pt-2 sm:pt-3 text-black/70">sicher und pünktlich</p>
+            <p className="pt-2 sm:pt-3 text-black/70">{servicesSubtitle[0]}</p>
           </div>
         </Link>
         <Link
@@ -47,13 +54,11 @@ function Services() {
           <div className="text-center py-8 sm:py-10 md:py-15">
             <div className="min-h-[3.5rem] md:min-h-[2.75rem] flex items-center justify-center">
               <h2 className="text-lg sm:text-xl tracking-wider">
-                Montage und Demontage
+                {servicesTitle[1]}
               </h2>
             </div>
 
-            <p className="pt-2 sm:pt-3 text-black/70">
-              fachgerecht und termingerecht
-            </p>
+            <p className="pt-2 sm:pt-3 text-black/70">{servicesSubtitle[1]}</p>
           </div>
         </Link>
         <Link
@@ -71,13 +76,11 @@ function Services() {
           <div className="text-center py-8 sm:py-10 md:py-15">
             <div className="min-h-[3.5rem] md:min-h-[2.75rem] flex items-center justify-center">
               <h2 className="text-lg sm:text-xl tracking-wider">
-                Reparatur und Ersatzteile
+                {servicesTitle[2]}
               </h2>
             </div>
 
-            <p className="pt-2 sm:pt-3 text-black/70">
-              schnell und zuverlässig
-            </p>
+            <p className="pt-2 sm:pt-3 text-black/70">{servicesSubtitle[2]}</p>
           </div>
         </Link>
       </div>
