@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
+import { useAuth } from "../../content/auth";
+
 import AdminIcon from "../../assets/icons/circle-user.png";
 import logo from "../../assets/images/logo.svg";
 import menuIcon from "../../assets/icons/menu-burger.png";
@@ -18,6 +20,9 @@ function Navbar() {
   const isHome = location.pathname === "/";
 
   const lastScrollY = useRef(0);
+
+  const { authed } = useAuth();
+  const adminPath = authed ? "/admin" : "/admin/login";
 
   useEffect(() => {
     if (menuOpen) closeMenu(); // guard inside closeMenu prevents the bug
@@ -160,7 +165,7 @@ function Navbar() {
             />
           </Link>
 
-          <Link to="/" onClick={menuOpen ? closeMenu : undefined}>
+          <Link to={adminPath} onClick={menuOpen ? closeMenu : undefined}>
             <img
               className="w-6 sm:w-7 cursor-pointer"
               src={AdminIcon}
