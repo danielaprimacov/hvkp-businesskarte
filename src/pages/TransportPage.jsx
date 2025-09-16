@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 
+import { useContent } from "../content/content";
+
 import Modal from "../components/ui/Modal";
 import OfferForm from "../components/OfferForm";
 
@@ -11,6 +13,14 @@ import arrowsIcon from "../assets/icons/angle-double-small-right.png";
 import questionIcon from "../assets/icons/interrogation.png";
 
 function TransportPage() {
+  const { content } = useContent();
+  const title = content.pages.transport.hero.title;
+  const subTitle = content.pages.transport.hero.subTitle;
+  const text = content.pages.transport.text;
+  const paragraph = content.pages.transport.paragraph;
+  const hilfeTitle = content.pages.transport.hilfe.title;
+  const hilfesubTitle = content.pages.transport.hilfe.subTitle;
+
   const containerRef = useRef(null);
   const sectionRef = useRef(null);
 
@@ -45,11 +55,10 @@ function TransportPage() {
           <div className="relative z-10 mx-auto max-w-6xl px-4 h-full flex items-center">
             <motion.div style={{ opacity: textOpacity }} className="text-white">
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-wider">
-                Krantransporte
+                {title}
               </h1>
               <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-blue-50 bg-black/60 px-4 sm:px-8 md:px-10 py-2 sm:py-3 rounded">
-                Planung, Genehmigungen sowie Transportbegleitung und
-                Absicherung.
+                {subTitle}
               </p>
             </motion.div>
           </div>
@@ -77,13 +86,10 @@ function TransportPage() {
         >
           <div className="flex flex-col justify-center items-center px-4">
             <p className="w-full max-w-3xl sm:max-w-4xl md:max-w-[60rem] mb-6 sm:mb-8 md:mb-10 text-2xl sm:text-3xl md:text-3xl/13 uppercase font-bold text-center">
-              Wir übernehmen Planung, Ausnahmegenehmigungen und Begleitfahrzeuge
-              für Ihren Krantransport.
+              {text}
             </p>
             <p className="w-full max-w-4xl md:max-w-[70rem] mb-8 sm:mb-10 text-center text-base sm:text-lg md:text-xl px-1">
-              Für ein schnelles Angebot senden Sie uns Maße/Gewichte der
-              Komponenten, Abhol- und Zieladresse sowie Ihr Zeitfenster &ndash;
-              wir melden uns kurzfristig mit einem Festpreis.
+              {paragraph}
             </p>
 
             <button
@@ -105,21 +111,16 @@ function TransportPage() {
                 alt="Question Icon"
                 className="w-6 sm:w-7 md:w-auto"
               />
-              <p className="text-lg sm:text-xl text-blue-400">
-                Benötigen Sie zusätzlich die (De-)Montage?
-              </p>
+              <p className="text-lg sm:text-xl text-blue-400">{hilfeTitle}</p>
             </div>
 
             <p className="max-w-3xl sm:max-w-4xl w-full mt-4 sm:mt-5 text-center text-sm sm:text-base">
-              Unser Team übernimmt die komplette Montage und Demontage Ihres
-              Turmdrehkrans &ndash; von der Planung und Baustellenlogistik über
-              Ballastierung und Elektroanschluss bis zur sicheren Abnahme.
-              Kurzfristige Termine möglich.
+              {hilfesubTitle}
             </p>
 
             <Link
               to="/de-montage"
-              className="mt-6 sm:mt-8 px-5 sm:px-6 py-2 flex gap-2 sm:gap-3 rounded-md text-white text-sm sm:text-base tracking-wider uppercase bg-blue-400 transition-all duration-300 hover:shadow-lg hover:bg-[#7c5e74] ease-in"
+              className="mt-6 sm:mt-8 px-5 sm:px-6 py-2 flex gap-2 sm:gap-3 rounded-md text-white text-sm sm:text-base tracking-wider uppercase bg-blue-400 transition-all duration-300 hover:shadow-lg hover:bg-blue-500 ease-in"
             >
               Leistungsumfang ansehen
             </Link>

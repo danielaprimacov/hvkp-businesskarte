@@ -1,14 +1,6 @@
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
-// const defaults = {
-//   heroTitle: "Hovekamp",
-//   heroSubtitle: "Planung, Montage, Logistik – alles aus einer Hand",
-//   servicesTitle: "Unsere Leistungen",
-//   contactLead:
-//     "Von Reparatur bis Montagen – kompletter Service rund um Ihren Turmdrehkran.",
-// };
-
-const DEFAULTS_VERSION = 3;
+const DEFAULTS_VERSION = 5;
 
 const defaults = {
   __v: DEFAULTS_VERSION,
@@ -45,10 +37,46 @@ const defaults = {
         question: "Sind Sie bereit, Ihr nächstes Projekt zu besprechen?",
       },
     },
-    transport: {},
-    demontage: {},
-    reparatur: {},
-    contact: {},
+    transport: {
+      hero: {
+        title: "Krantransporte",
+        subTitle:
+          "Planung, Genehmigungen sowie Transportbegleitung und Absicherung.",
+      },
+      text: "Wir übernehmen Planung, Ausnahmegenehmigungen und Begleitfahrzeuge für Ihren Krantransport",
+      paragraph:
+        "Für ein schnelles Angebot senden Sie uns Maße/Gewichte der Komponenten, Abhol- und Zieladresse sowie Ihr Zeitfenster - wir melden uns kurzfristig mit einem Festpreis.",
+      hilfe: {
+        title: "Benötigen Sie zusätzlich die (De-)Montage?",
+        subTitle:
+          "Unser Team übernimmt die komplette Montage und Demontage Ihres Turmdrehkrans – von der Planung und Baustellenlogistik über Ballastierung und Elektroanschluss bis zur sicheren Abnahme. Kurzfristige Termine möglich.",
+      },
+    },
+    demontage: {
+      hero: {
+        title: "Montage & Demontage",
+        subTitle:
+          "Planung, Demontage und Montage sowie Koordination von Autokranen und Ballastierung.",
+      },
+      text: "Wir übernehmen Planung, (De-)Montage und Abnahme Ihres Turmdrehkrans – fachgerecht und termingerecht.",
+      paragraph:
+        "Für ein schnelles Angebot senden Sie uns Kranmodell/Typ, Baustellenadresse, Zugänglichkeit (Autokran-/Stellfläche), ggf. Auslegerlänge/Ballast sowie Ihr Zeitfenster – wir melden uns kurzfristig mit einem Festpreis.",
+      hilfe: {
+        title: "Benötigen Sie einen Krantransport?",
+        subTitle:
+          "Planung, Koordination der Fahrzeuge und Begleitfahrzeuge, abgestimmte Zeitfenster und zuverlässige Zustellung – alles aus einer Hand. Kurzfristige Einsätze möglich.",
+      },
+    },
+    reparatur: {
+      hero: {
+        title: "Reparatur & Ersatzteile",
+        subTitle:
+          "Fehlersuche, Reparatur und Service sowie Ersatzteilbeschaffung und Funktionsprüfung.",
+      },
+      text: "Wir übernehmen Diagnose, Reparatur und Ersatzteilbeschaffung – schnell und zuverlässig.",
+      paragraph:
+        "Für ein schnelles Angebot senden Sie uns Kranmodell/Typ, Seriennummer, Fehlerbild (kurze Beschreibung/Fotos), Standort sowie Ihr Zeitfenster – wir melden uns kurzfristig mit einem Festpreis.",
+    },
   },
 };
 

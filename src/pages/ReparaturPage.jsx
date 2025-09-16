@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
+import { useContent } from "../content/content";
+
 import Modal from "../components/ui/Modal";
 import OfferForm from "../components/OfferForm";
 
@@ -9,6 +11,12 @@ import arrowDownIcon from "../assets/icons/arrow-circle-down-reparatur.png";
 import arrowsIcon from "../assets/icons/angle-double-small-right.png";
 
 function ReparaturPage() {
+  const { content } = useContent();
+  const title = content.pages.reparatur.hero.title;
+  const subTitle = content.pages.reparatur.hero.subTitle;
+  const text = content.pages.reparatur.text;
+  const paragraph = content.pages.reparatur.paragraph;
+
   const containerRef = useRef(null);
   const sectionRef = useRef(null);
 
@@ -43,11 +51,10 @@ function ReparaturPage() {
           <div className="relative z-10 mx-auto max-w-6xl px-4 h-full flex items-center">
             <motion.div style={{ opacity: textOpacity }} className="text-white">
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-wider">
-                Reparatur &amp; Ersatzteile
+                {title}
               </h1>
               <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-blue-50 bg-black/60 px-4 sm:px-8 md:px-10 py-2 sm:py-3 rounded">
-                Fehlersuche, Reparatur und Service sowie Ersatzteilbeschaffung
-                und Funktionsprüfung.
+                {subTitle}
               </p>
             </motion.div>
           </div>
@@ -75,14 +82,10 @@ function ReparaturPage() {
         >
           <div className="flex flex-col justify-center items-center px-4">
             <p className="w-full max-w-3xl sm:max-w-4xl md:max-w-[60rem] mb-6 sm:mb-8 md:mb-10 text-2xl sm:text-3xl md:text-3xl/13 uppercase font-bold text-center">
-              Wir übernehmen Diagnose, Reparatur und Ersatzteilbeschaffung –
-              schnell und zuverlässig.
+              {text}
             </p>
             <p className="w-full max-w-4xl md:max-w-[70rem] mb-8 sm:mb-10 text-center text-base sm:text-lg md:text-xl px-1">
-              Für ein schnelles Angebot senden Sie uns Kranmodell/Typ,
-              Seriennummer, Fehlerbild (kurze Beschreibung/Fotos), Standort
-              sowie Ihr Zeitfenster &ndash; wir melden uns kurzfristig mit einem
-              Festpreis.
+              {paragraph}
             </p>
 
             <button
