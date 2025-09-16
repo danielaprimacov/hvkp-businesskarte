@@ -171,7 +171,7 @@ function Footer() {
 
             <li>
               <Link
-                to="/"
+                to="/impressum"
                 className="group relative inline-block whitespace-nowrap"
               >
                 <span

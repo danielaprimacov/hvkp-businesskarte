@@ -8,31 +8,32 @@ import ReparaturPage from "./pages/ReparaturPage";
 import TransportPage from "./pages/TransportPage";
 import AdminPage from "./pages/AdminPage";
 import AdminLogin from "./pages/AdminLogin";
+import ImpressumPage from "./pages/ImpressumPage";
 
 import { ProtectedRoute } from "./content/auth";
 
 function App() {
   return (
+    <Routes>
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/transport" element={<TransportPage />} />
+        <Route path="/de-montage" element={<DeMontagePage />} />
+        <Route path="/reparatur" element={<ReparaturPage />} />
+        <Route path="/kontakt" element={<ContactPage />} />
+        <Route path="/impressum" element={<ImpressumPage />} />
+      </Route>
 
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/transport" element={<TransportPage />} />
-            <Route path="/de-montage" element={<DeMontagePage />} />
-            <Route path="/reparatur" element={<ReparaturPage />} />
-            <Route path="/kontakt" element={<ContactPage />} />
-          </Route>
-
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminPage />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 
