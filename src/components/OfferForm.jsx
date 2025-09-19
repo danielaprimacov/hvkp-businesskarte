@@ -130,7 +130,7 @@ function OfferForm({ onClose, variant = "general" }) {
 
   useEffect(() => {
     if (!success) return;
-    const t = setTimeout(() => onClose?.(), 3000); // close in 5s
+    const t = setTimeout(() => onClose?.(), 3000); // close in 3s
     return () => clearTimeout(t); // cleanup if unmounted
   }, [success, onClose]);
 
@@ -149,7 +149,7 @@ function OfferForm({ onClose, variant = "general" }) {
     }
 
     try {
-      const res = await fetch("/.netlify/functions/send-offer", {
+      const res = await fetch("/api/send-offer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ form, variant }),
@@ -208,6 +208,9 @@ function OfferForm({ onClose, variant = "general" }) {
             placeholder=" "
             aria-invalid={!!errors.name}
             className={fieldClass(errors.name)}
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
           />
           <label
             htmlFor="name"
@@ -232,6 +235,9 @@ function OfferForm({ onClose, variant = "general" }) {
             placeholder=" "
             aria-invalid={!!errors.email}
             className={fieldClass(errors.email)}
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
           />
           <label
             htmlFor="email"
@@ -255,6 +261,9 @@ function OfferForm({ onClose, variant = "general" }) {
           onChange={handleChange}
           placeholder=" "
           className={fieldClass(false)}
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
         />
         <label
           htmlFor="phone"
@@ -331,6 +340,9 @@ function OfferForm({ onClose, variant = "general" }) {
               required
               placeholder=" "
               className={fieldClass(errors.craneModel)}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
             <label
               htmlFor="craneModel"
@@ -353,6 +365,9 @@ function OfferForm({ onClose, variant = "general" }) {
               required
               placeholder=" "
               className={fieldClass(errors.craneManufacturers)}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
             <label
               htmlFor="craneManufacturers"
@@ -384,6 +399,9 @@ function OfferForm({ onClose, variant = "general" }) {
               className={`${fieldClass(
                 errors.constructionYear
               )} appearance-none`}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
             <label
               htmlFor="constructionYear"
@@ -412,6 +430,9 @@ function OfferForm({ onClose, variant = "general" }) {
               required
               placeholder=" "
               className={fieldClass(errors.pickupAddress)}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
             <label
               htmlFor="pickupAddress"
@@ -436,6 +457,9 @@ function OfferForm({ onClose, variant = "general" }) {
               required
               placeholder=" "
               className={fieldClass(errors.destinationAddress)}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
             <label
               htmlFor="destinationAddress"
@@ -463,6 +487,9 @@ function OfferForm({ onClose, variant = "general" }) {
             required
             placeholder=" "
             className={fieldClass(errors.siteAddress)}
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
           />
           <label
             htmlFor="siteAddress"
@@ -502,6 +529,9 @@ function OfferForm({ onClose, variant = "general" }) {
                 className={`${fieldClass(
                   errors.heightOfTheConstruction
                 )} appearance-none`}
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
               />
               <label
                 className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
@@ -530,6 +560,9 @@ function OfferForm({ onClose, variant = "general" }) {
                 className={`${fieldClass(
                   errors.widthOfTheConstruction
                 )} appearance-none`}
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
               />
               <label
                 className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
@@ -558,6 +591,9 @@ function OfferForm({ onClose, variant = "general" }) {
                 className={`${fieldClass(
                   errors.lengthOfTheConstruction
                 )} appearance-none`}
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
               />
               <label
                 className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
@@ -584,6 +620,9 @@ function OfferForm({ onClose, variant = "general" }) {
               checked={!!form.carport}
               onChange={handleChange}
               className="h-4 w-4 rounded border-gray-300 accent-blue-400"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
             <span className="text-sm text-gray-700">Carport / Garage</span>
           </label>
@@ -595,6 +634,9 @@ function OfferForm({ onClose, variant = "general" }) {
               checked={!!form.nearbyTrees}
               onChange={handleChange}
               className="h-4 w-4 rounded border-gray-300 accent-blue-400"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
             <span className="text-sm text-gray-700">
               Bäume in der Nähe (mögliche Einschränkungen)

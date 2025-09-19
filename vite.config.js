@@ -4,5 +4,13 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: { proxy: { "/api": "http://localhost:4000" } },
+  server: {
+    proxy: {
+      "/api": { target: "http://localhost:3001", changeOrigin: true },
+      "/.netlify/functions": {
+        target: "http://localhost:8888",
+        changeOrigin: true,
+      },
+    },
+  },
 });
