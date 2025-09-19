@@ -1,8 +1,14 @@
 // src/admin/AdminPage.jsx
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+
 import { useContent } from "../content/content";
 import { useAuth } from "../content/auth";
+
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} from "../lib/cloudinaryClient";
 
 /* ========= Utility helpers ========= */
 // Formats camelCase / snake_case into spaced header text
@@ -94,6 +100,9 @@ function StringArrayField({ label, value, onChange }) {
 
 // Object array editor (e.g., logos with {url, alt})
 function ObjectArrayField({ label, value, onChange }) {
+  const [busyIdx, setBusyIdx] = useState(null);
+  const [errMsg, setErrMsg] = useState("");
+
   const updateItem = (i, k, v) => {
     const next = value.map((obj, idx) =>
       idx === i ? { ...obj, [k]: v } : obj
@@ -102,6 +111,55 @@ function ObjectArrayField({ label, value, onChange }) {
   };
   const addItem = () => onChange([...(value || []), {}]);
   const removeIdx = (i) => onChange(value.filter((_, idx) => idx !== i));
+
+  const handlePickFile = async (i, file) => {
+    if (!file) return;
+    setErrMsg("");
+    setBusyIdx(i);
+    try {
+      const result = await uploadToCloudinary(file, {
+        folder: "hovekamp/logos",
+      });
+      // result.secure_url / result.public_id
+      const next = value.map((obj, idx) =>
+        idx === i
+          ? {
+              ...obj,
+              url: result.secure_url,
+              publicId: result.public_id,
+              // keep alt untouched; admin can type it
+            }
+          : obj
+      );
+      onChange(next);
+    } catch (e) {
+      console.error(e);
+      setErrMsg("Upload fehlgeschlagen. Bitte erneut versuchen.");
+    } finally {
+      setBusyIdx(null);
+    }
+  };
+
+  const handleReplace = (i) => (e) => {
+    const file = e.target.files?.[0];
+    if (file) handlePickFile(i, file);
+    e.target.value = ""; // reset so same file can be picked again
+  };
+
+  const handleDeleteAsset = async (i) => {
+    const obj = value[i] || {};
+    // 1) remove from content immediately
+    removeIdx(i);
+    // 2) optionally delete from Cloudinary if publicId present (best-effort)
+    if (obj.publicId) {
+      try {
+        await deleteFromCloudinary(obj.publicId);
+      } catch (e) {
+        // not fatal; asset may remain in Cloudinary
+        console.warn("Cloudinary delete failed:", e);
+      }
+    }
+  };
 
   return (
     <div className="mb-6">
@@ -116,6 +174,8 @@ function ObjectArrayField({ label, value, onChange }) {
         </button>
       </div>
 
+      {errMsg && <div className="mb-2 text-sm text-red-600">{errMsg}</div>}
+
       {/* responsive cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {value.map((obj, i) => (
@@ -126,40 +186,61 @@ function ObjectArrayField({ label, value, onChange }) {
               </div>
               <button
                 type="button"
-                onClick={() => removeIdx(i)}
+                onClick={() => handleDeleteAsset(i)}
                 className="px-3 py-1.5 rounded border hover:bg-gray-50 text-sm cursor-pointer"
+                disabled={busyIdx === i}
               >
                 Entfernen
               </button>
             </div>
 
-            {/* render known keys first for usability on small screens */}
-            {["url", "alt"].map((k) =>
-              k in obj ? (
-                <TextField
-                  key={k}
-                  label={titleize(k)}
-                  value={obj[k] ?? ""}
-                  onChange={(v) => updateItem(i, k, v)}
+            {/* Preview */}
+            {obj.url ? (
+              <div className="mb-3">
+                <img
+                  src={obj.url}
+                  alt={obj.alt || "Logo"}
+                  className="h-16 w-auto object-contain"
                 />
-              ) : null
+              </div>
+            ) : (
+              <div className="mb-3 text-xs text-gray-500">
+                Kein Bild hochgeladen.
+              </div>
             )}
-            {/* render any additional keys */}
-            {Object.keys(obj)
-              .filter((k) => !["url", "alt"].includes(k))
-              .map((k) => (
-                <TextField
-                  key={k}
-                  label={titleize(k)}
-                  value={obj[k] ?? ""}
-                  onChange={(v) => updateItem(i, k, v)}
-                />
-              ))}
 
-            {Object.keys(obj).length === 0 && (
-              <div className="text-xs text-gray-500">
-                Fügen Sie Felder wie <code>url</code> oder <code>alt</code>{" "}
-                hinzu.
+            {/* Upload / Replace */}
+            <div className="mb-3">
+              <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
+                <span className="px-3 py-1.5 rounded border hover:bg-gray-50">
+                  {obj.url ? "Bild ersetzen" : "Bild hochladen"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleReplace(i)}
+                  disabled={busyIdx === i}
+                />
+                {busyIdx === i && (
+                  <span className="text-xs text-gray-500">Lade hoch…</span>
+                )}
+              </label>
+            </div>
+
+            {/* Known fields */}
+            <TextField
+              label="Alt-Text"
+              value={obj.alt ?? ""}
+              onChange={(v) => updateItem(i, "alt", v)}
+            />
+
+            {/* Readonly info */}
+            {obj.publicId && (
+              <div className="text-[11px] text-gray-500 break-all">
+                <div>
+                  <b>publicId:</b> {obj.publicId}
+                </div>
               </div>
             )}
           </div>

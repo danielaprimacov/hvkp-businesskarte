@@ -8,6 +8,9 @@ import { fileURLToPath } from "url";
 
 import nodemailer from "nodemailer";
 
+import crypto from "crypto";
+import { v2 as cloudinary } from "cloudinary";
+
 // ---------- Paths / constants ----------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +18,12 @@ const __dirname = path.dirname(__filename);
 const PORT = Number(process.env.PORT || 3001);
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || ""; // Bearer for write API (use proper session in production)
 const NODE_ENV = process.env.NODE_ENV || "development";
+
+// CLOUDINARY
+const C_CLOUD = process.env.CLOUDINARY_CLOUD_NAME;
+const C_KEY = process.env.CLOUDINARY_API_KEY;
+const C_SECRET = process.env.CLOUDINARY_API_SECRET;
+const C_FOLDER = process.env.CLOUDINARY_FOLDER || "hovekamp/logos";
 
 // DB selection: "sqlite" (default) or "postgres"
 const DB_CLIENT = (process.env.DB_CLIENT || "sqlite").toLowerCase();
@@ -39,14 +48,29 @@ function rateLimit(req, res, next) {
 }
 
 // ===========================================================
+// 0) EXPRESS APP — ДОЛЖЕН БЫТЬ ДО ОБЪЯВЛЕНИЯ РОУТОВ!
+// ===========================================================
+const app = express();
+app.use(
+  cors({
+    origin:
+      NODE_ENV === "production"
+        ? false
+        : [/localhost:\d+$/, /127\.0\.0\.1:\d+$/],
+    credentials: true,
+  })
+);
+app.use(helmet());
+app.use(express.json({ limit: "5mb" }));
+
+// ===========================================================
 // 1) DATABASE LAYER (SQLite default, optional Postgres)
 // ===========================================================
 let dbReadyPromise;
-let getContent; // async (id) => { id, body, version, updated_at }
-let updateContent; // async (id, nextBody, expectedVersion) => same | null (on conflict)
+let getContent;
+let updateContent;
 
 if (DB_CLIENT === "postgres") {
-  // --------- Postgres adapter (requires pg) ---------
   dbReadyPromise = (async () => {
     const { Pool } = await import("pg");
     const PG_URL = process.env.POSTGRES_URL || process.env.DATABASE_URL;
@@ -56,7 +80,6 @@ if (DB_CLIENT === "postgres") {
       );
     const pool = new Pool({ connectionString: PG_URL });
 
-    // Ensure table exists
     await pool.query(`
       CREATE TABLE IF NOT EXISTS content (
         id TEXT PRIMARY KEY,
@@ -65,7 +88,6 @@ if (DB_CLIENT === "postgres") {
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
     `);
-    // Seed single row
     await pool.query(
       `INSERT INTO content (id, body, version)
        VALUES ('site', $1::jsonb, 1)
@@ -96,7 +118,7 @@ if (DB_CLIENT === "postgres") {
          RETURNING id, body, version, updated_at`,
         [JSON.stringify(nextBody), id, expectedVersion]
       );
-      if (!rows[0]) return null; // conflict
+      if (!rows[0]) return null;
       const r = rows[0];
       return {
         id: r.id,
@@ -109,7 +131,6 @@ if (DB_CLIENT === "postgres") {
     return "postgres-ready";
   })();
 } else {
-  // --------- SQLite adapter (better-sqlite3) ---------
   dbReadyPromise = (async () => {
     const { default: Database } = await import("better-sqlite3");
     const DB_PATH =
@@ -156,7 +177,7 @@ if (DB_CLIENT === "postgres") {
         body: JSON.stringify(nextBody),
         version: expectedVersion,
       });
-      if (res.changes === 0) return null; // conflict
+      if (res.changes === 0) return null;
       return getContent(id);
     };
 
@@ -165,12 +186,82 @@ if (DB_CLIENT === "postgres") {
 }
 
 // ===========================================================
-// 2) MAIL (Nodemailer) — server-side only
+// 2) CLOUDINARY ROUTES (после app, есть body-parser)
+// ===========================================================
+if (!C_CLOUD || !C_KEY || !C_SECRET) {
+  console.warn(
+    "[Cloudinary] Missing env vars CLOUDINARY_CLOUD_NAME / API_KEY / API_SECRET"
+  );
+}
+
+cloudinary.config({
+  cloud_name: C_CLOUD,
+  api_key: C_KEY,
+  api_secret: C_SECRET,
+});
+
+// Signed upload signature
+app.post("/api/cloudinary/sign", (req, res) => {
+  try {
+    if (!C_SECRET || !C_KEY || !C_CLOUD) {
+      return res.status(500).json({ error: "cloudinary_not_configured" });
+    }
+    const { folder } = req.body || {};
+    const timestamp = Math.floor(Date.now() / 1000);
+
+    const paramsToSign = {
+      timestamp,
+      folder: folder || C_FOLDER,
+    };
+
+    const toSign = Object.keys(paramsToSign)
+      .sort()
+      .map((k) => `${k}=${paramsToSign[k]}`)
+      .join("&");
+
+    const signature = crypto
+      .createHash("sha1")
+      .update(toSign + C_SECRET)
+      .digest("hex");
+
+    res.json({
+      cloudName: C_CLOUD,
+      apiKey: C_KEY,
+      signature,
+      timestamp,
+      folder: paramsToSign.folder,
+    });
+  } catch (e) {
+    console.error("[cloudinary/sign] error", e);
+    res.status(500).json({ error: "sign_failed" });
+  }
+});
+
+// Protected delete
+app.post("/api/cloudinary/delete", async (req, res) => {
+  try {
+    const auth = (req.headers.authorization || "").split(" ");
+    if (auth[0] !== "Bearer" || auth[1] !== ADMIN_TOKEN) {
+      return res.status(401).json({ error: "unauthorized" });
+    }
+    const { publicId } = req.body || {};
+    if (!publicId) return res.status(400).json({ error: "missing_public_id" });
+
+    const result = await cloudinary.uploader.destroy(publicId);
+    res.json({ ok: true, result });
+  } catch (e) {
+    console.error("[cloudinary/delete] error", e);
+    res.status(500).json({ error: "delete_failed" });
+  }
+});
+
+// ===========================================================
+// 3) MAIL (Nodemailer)
 // ===========================================================
 const mailer = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT || 587),
-  secure: process.env.SMTP_SECURE === "true", // true for 465
+  secure: process.env.SMTP_SECURE === "true",
   auth: process.env.SMTP_USER
     ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
     : undefined,
@@ -181,106 +272,15 @@ mailer
   .catch((e) => console.error("[MAIL] SMTP ERROR:", e));
 
 function escapeHtml(s = "") {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  /* ... как у тебя ... */
 }
-
 function makeEmailHtml(form = {}, variant = "general") {
-  const titleMap = {
-    general: "Ihre Anfrage",
-    transport: "Angebot für Krantransport",
-    montage: "Angebot für (De-)Montage",
-    repair: "Angebot für Reparatur & Ersatzteile",
-  };
-
-  const rows = [
-    ["Name", form.name],
-    ["Email", form.email],
-    ["Telefon", form.phone],
-  ];
-
-  if (variant === "general") {
-    rows.push(
-      ["Höhe (m)", form.heightOfTheConstruction],
-      ["Breite (m)", form.widthOfTheConstruction],
-      ["Länge (m)", form.lengthOfTheConstruction],
-      ["Carport/Garage", form.carport ? "Ja" : "Nein"],
-      ["Bäume in der Nähe", form.nearbyTrees ? "Ja" : "Nein"],
-      ["Nachricht", form.message]
-    );
-  } else {
-    rows.push(
-      ["Kranmodell/Typ", form.craneModel],
-      ["Kranhersteller", form.craneManufacturers],
-      ["Baujahr", form.constructionYear]
-    );
-    if (variant === "transport") {
-      rows.push(
-        ["Abholadresse", form.pickupAddress],
-        ["Zieladresse", form.destinationAddress]
-      );
-    }
-    if (variant === "montage" || variant === "repair") {
-      rows.push(["Baustellenadresse", form.siteAddress]);
-    }
-    if (variant === "repair") {
-      rows.push(["Problembeschreibung", form.problemDescription]);
-    }
-    if (form.message) rows.push(["Nachricht (freiwillig)", form.message]);
-  }
-
-  const tr = rows
-    .map(
-      ([k, v]) => `
-    <tr>
-      <td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:600">${escapeHtml(
-        k
-      )}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #eee">${escapeHtml(
-        v ?? ""
-      )}</td>
-    </tr>
-  `
-    )
-    .join("");
-
-  return `
-    <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#111">
-      <h2 style="margin:0 0 12px 0">${escapeHtml(
-        titleMap[variant] || "Neue Anfrage"
-      )}</h2>
-      <table style="border-collapse:collapse;width:100%;max-width:720px;background:#fff;border:1px solid #eee">
-        <tbody>${tr}</tbody>
-      </table>
-      <p style="margin-top:14px;font-size:12px;color:#666">
-        Gesendet am ${new Date().toLocaleString("de-DE")}
-      </p>
-    </div>`;
+  /* ... как у тебя ... */
 }
 
 // ===========================================================
-// 3) EXPRESS APP
+// 4) CONTENT API
 // ===========================================================
-const app = express();
-
-// CORS: relaxed in dev; in production, prefer same-origin & remove/limit CORS
-app.use(
-  cors({
-    origin:
-      NODE_ENV === "production"
-        ? false
-        : [/localhost:\d+$/, /127\.0\.0\.1:\d+$/],
-    credentials: true,
-  })
-);
-app.use(helmet());
-app.use(express.json({ limit: "2mb" }));
-
-// ----- Content API (public read) -----
 app.get("/api/content", async (_req, res) => {
   try {
     await dbReadyPromise;
@@ -297,13 +297,9 @@ app.get("/api/content", async (_req, res) => {
   }
 });
 
-// ----- Content API (protected write) -----
-// Use: Authorization: Bearer <ADMIN_TOKEN>
-// In production, replace with proper auth (session + HttpOnly cookie).
 app.put("/api/content", async (req, res) => {
   try {
     await dbReadyPromise;
-
     const auth = (req.headers.authorization || "").split(" ");
     if (auth[0] !== "Bearer" || auth[1] !== ADMIN_TOKEN) {
       return res.status(401).json({ error: "unauthorized" });
@@ -329,26 +325,24 @@ app.put("/api/content", async (req, res) => {
   }
 });
 
-// ----- Mail endpoint -----
+// ===========================================================
+// 5) OFFER MAIL
+// ===========================================================
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 app.post("/api/send-offer", rateLimit, async (req, res) => {
   try {
     const { form, variant } = req.body || {};
     if (!form || !variant)
       return res.status(400).json({ ok: false, error: "Bad payload" });
-
     if (!form.name || !form.email || !emailRe.test(String(form.email))) {
       return res.status(400).json({ ok: false, error: "Invalid name/email" });
     }
-
     const subjectMap = {
       general: "Neue Anfrage (Allgemein)",
       transport: "Angebot: Krantransport",
       montage: "Angebot: (De-)Montage",
       repair: "Angebot: Reparatur & Ersatzteile",
     };
-
     const info = await mailer.sendMail({
       from: `${process.env.FROM_NAME || "Webformular"} <${
         process.env.FROM_EMAIL
@@ -361,7 +355,6 @@ app.post("/api/send-offer", rateLimit, async (req, res) => {
         .map(([k, v]) => `${k}: ${v ?? ""}`)
         .join("\n"),
     });
-
     console.log("[MAIL] sent", info.messageId);
     res.json({ ok: true });
   } catch (e) {
@@ -370,7 +363,9 @@ app.post("/api/send-offer", rateLimit, async (req, res) => {
   }
 });
 
-// ----- Serve built frontend in production -----
+// ===========================================================
+// 6) STATIC (production)
+// ===========================================================
 if (NODE_ENV === "production") {
   const distDir = path.resolve(__dirname, "../dist");
   if (fs.existsSync(distDir)) {
@@ -385,7 +380,7 @@ if (NODE_ENV === "production") {
 }
 
 // ===========================================================
-// 4) START
+// 7) START
 // ===========================================================
 app.listen(PORT, async () => {
   try {
