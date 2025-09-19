@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
+import { fetchContentFromServer, saveContentToServer } from "../lib/cmsApi";
+
 const DEFAULTS_VERSION = 5;
 
 const defaults = {
@@ -80,17 +82,10 @@ const defaults = {
   },
 };
 
-/* ========= STORAGE KEYS ========= */
-const KEY_OVERRIDES = "siteContent_overrides_v1";
-const KEY_OLD_FULL = "siteContent_v1";
-
-/* ========= HELPERS ========= */
 const isObj = (v) => v && typeof v === "object" && !Array.isArray(v);
 
 function deepMerge(a, b) {
-  if (Array.isArray(a) || Array.isArray(b)) {
-    return b !== undefined ? b : a;
-  }
+  if (Array.isArray(a) || Array.isArray(b)) return b !== undefined ? b : a;
   if (isObj(a) && isObj(b)) {
     const out = { ...a };
     for (const k of Object.keys(b)) out[k] = deepMerge(a?.[k], b[k]);
@@ -100,12 +95,11 @@ function deepMerge(a, b) {
 }
 
 function normalizeDeep(x) {
-  if (typeof x === "string") {
+  if (typeof x === "string")
     return x
       .replaceAll("&ndash;", "–")
       .replaceAll("&mdash;", "—")
       .replaceAll("&nbsp;", " ");
-  }
   if (Array.isArray(x)) return x.map(normalizeDeep);
   if (isObj(x)) {
     const out = {};
@@ -133,7 +127,6 @@ function delAtPath(obj, path) {
   const parts = Array.isArray(path) ? path : String(path).split(".");
   const stack = [];
   let cur = Array.isArray(obj) ? [...obj] : { ...obj };
-
   for (let i = 0; i < parts.length - 1; i++) {
     const k = parts[i];
     stack.push({ parent: cur, key: k });
@@ -142,12 +135,10 @@ function delAtPath(obj, path) {
     cur = cur[k];
   }
   delete cur[parts[parts.length - 1]];
-
   for (let i = stack.length - 1; i >= 0; i--) {
     const { parent, key } = stack[i];
-    if (isObj(parent[key]) && Object.keys(parent[key]).length === 0) {
+    if (isObj(parent[key]) && Object.keys(parent[key]).length === 0)
       delete parent[key];
-    }
   }
   return stack.length ? stack[0].parent : cur;
 }
@@ -173,40 +164,57 @@ function deepDiff(base, obj) {
   return base !== obj ? obj : undefined;
 }
 
-/* ========= MIGRATION (со старого полного контента) ========= */
-function loadOverrides() {
-  try {
-    const raw = localStorage.getItem(KEY_OVERRIDES);
-    if (raw) return normalizeDeep(JSON.parse(raw));
-
-    const oldRaw = localStorage.getItem(KEY_OLD_FULL);
-    if (oldRaw) {
-      const oldFull = normalizeDeep(JSON.parse(oldRaw));
-      const overrides = deepDiff(defaults, oldFull) || {};
-      localStorage.setItem(KEY_OVERRIDES, JSON.stringify(overrides));
-      // delete old key
-      localStorage.removeItem(KEY_OLD_FULL);
-      return overrides;
-    }
-  } catch {}
-  return {};
-}
-
-/* ========= CONTEXT ========= */
+/* ===== Context backed by the server ===== */
 const ContentCtx = createContext(null);
 
 export function ContentProvider({ children }) {
-  const [overrides, setOverrides] = useState(() => loadOverrides());
+  const [overrides, setOverrides] = useState({});
+  const [serverVersion, setServerVersion] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [conflict, setConflict] = useState(null); // contains server snapshot on conflict
 
+  // 1) Initial load from server
+  useEffect(() => {
+    (async () => {
+      try {
+        const { body, version } = await fetchContentFromServer();
+        const initialOverrides = deepDiff(defaults, normalizeDeep(body)) || {};
+        setOverrides(initialOverrides);
+        setServerVersion(version);
+      } catch (e) {
+        console.error("Failed to load content:", e);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  // The merged content the app uses
   const content = useMemo(() => deepMerge(defaults, overrides), [overrides]);
 
+  // 2) Auto-save to server when overrides change (debounced in helper)
   useEffect(() => {
-    try {
-      localStorage.setItem(KEY_OVERRIDES, JSON.stringify(overrides));
-    } catch {}
-  }, [overrides]);
+    if (loading) return;
+    setSaving(true);
+    const nextBody = deepMerge(defaults, overrides);
+    saveContentToServer(nextBody, serverVersion)
+      .then(({ version }) => {
+        setServerVersion(version);
+        setConflict(null);
+      })
+      .catch((e) => {
+        if (e?.code === "version_conflict") {
+          // Somebody else saved first — show a banner, let admin reload/resolve.
+          setConflict(e.data); // { current: { body, version, updated_at } }
+        } else {
+          console.error("Save failed:", e);
+        }
+      })
+      .finally(() => setSaving(false));
+  }, [overrides]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // API
+  // public API — unchanged for your AdminPage
   const update = (path, value) => {
     if (typeof path === "string") {
       setOverrides((prev) => setAtPath(prev, path, normalizeDeep(value)));
@@ -215,14 +223,13 @@ export function ContentProvider({ children }) {
     }
   };
 
-  const remove = (path) => {
-    setOverrides((prev) => delAtPath(prev, path));
-  };
-
+  const remove = (path) => setOverrides((prev) => delAtPath(prev, path));
   const reset = () => setOverrides({});
 
   return (
-    <ContentCtx.Provider value={{ content, update, remove, reset }}>
+    <ContentCtx.Provider
+      value={{ content, update, remove, reset, loading, saving, conflict }}
+    >
       {children}
     </ContentCtx.Provider>
   );

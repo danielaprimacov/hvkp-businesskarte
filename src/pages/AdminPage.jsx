@@ -256,7 +256,8 @@ function SectionCard({ title, children }) {
 
 /* ========= Main Admin Page ========= */
 export default function AdminPage() {
-  const { content, update, reset } = useContent();
+  const { content, update, reset, saving, conflict } = useContent();
+
   const { logout } = useAuth();
 
   // Build tabs from content.pages
@@ -273,7 +274,19 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3">
           <h1 className="text-lg sm:text-xl font-semibold mb-3">
             Admin Inhalte
+            <span className="ml-2 text-xs align-middle text-blue-700">
+              {saving
+                ? "Speichern…"
+                : conflict
+                ? "Konflikt – neu laden"
+                : "Gespeichert"}
+            </span>
           </h1>
+          {conflict && (
+            <div className="mb-3 text-xs text-red-600">
+              Inhalte wurden auf dem Server geändert. Bitte Seite neu laden.
+            </div>
+          )}
 
           {/* --- Tabs --- */}
           {/* Mobile: vertical stacked buttons */}
@@ -362,12 +375,6 @@ export default function AdminPage() {
             </SectionCard>
           </div>
         )}
-
-        {/* Footer info */}
-        <div className="mt-8 text-xs text-gray-500 leading-relaxed">
-          Änderungen werden im <code>localStorage</code> gespeichert. Mit{" "}
-          <b>Zurücksetzen</b> wird alles auf die Standardwerte gesetzt.
-        </div>
       </div>
     </div>
   );
