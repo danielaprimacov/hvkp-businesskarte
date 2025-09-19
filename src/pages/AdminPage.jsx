@@ -1,4 +1,3 @@
-// src/admin/AdminPage.jsx
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -342,9 +341,9 @@ export default function AdminPage() {
   const { logout } = useAuth();
 
   // Build tabs from content.pages
-  const pages = content?.pages || {};
+  const pages = content?.seiten || {};
   const pageKeys = useMemo(() => Object.keys(pages), [pages]);
-  const [active, setActive] = useState(pageKeys[0] || "home");
+  const [active, setActive] = useState(pageKeys[0] || "startseite");
 
   const ActivePageNode = pages[active];
 
@@ -450,7 +449,7 @@ export default function AdminPage() {
             <SectionCard title={titleize(active)}>
               <FormRenderer
                 node={ActivePageNode}
-                basePath={`pages.${active}`}
+                basePath={`seiten.${active}`}
                 update={update}
               />
             </SectionCard>

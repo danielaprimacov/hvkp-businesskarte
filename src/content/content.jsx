@@ -2,81 +2,86 @@ import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
 import { fetchContentFromServer, saveContentToServer } from "../lib/cmsApi";
 
-const DEFAULTS_VERSION = 5;
+const DEFAULTS_VERSION = 7;
 
 const defaults = {
   __v: DEFAULTS_VERSION,
-  pages: {
-    home: {
-      heroSection: {
-        title: "Hovekamp",
-        subTitle: "Planung, Montage, Logistik – alles aus einer Hand",
+  seiten: {
+    startseite: {
+      introbereich: {
+        abschnittstitel: "Hovekamp",
+        abschnittsuntertitel:
+          "Planung, Montage, Logistik – alles aus einer Hand",
       },
-      craneManufactures: {
-        title: "Unsere Kranmarken",
+      kranhersteller: {
+        titel: "Unsere Kranmarken",
         logos: [
           { url: "/logos/Liebherr-Logo.png", alt: "Liebherr Logo" },
           { url: "/logos/Potain-Logo.png", alt: "Potain Logo" },
         ],
       },
-      servicesSection: {
-        title: "Unsere Leistungen",
-        serviceTitle: [
+      leistungsbereich: {
+        titel: "Unsere Leistungen",
+        abschnittstitel: [
           "Krantransporte",
           "Montage und Demontage",
           "Reparatur und Ersatzteile",
         ],
-        serviceSubtitle: [
+        abschnittsuntertitelTitle: [
           "sicher und pünktlich",
           "fachgerecht und termingerecht",
           "schnell und zuverlässig",
         ],
       },
-      contactSection: {
-        text: "Von Reparatur bis Montagen, wir haben den kompletten Service rund um ihren Turmdrehkran. Sie suchen eine Kran zum Kauf oder zur Miete oder einfach nur Ersatzteile?",
-        paragraph:
+      kontaktbereich: {
+        leistungsbeschreibung:
+          "Von Reparatur bis Montagen, wir haben den kompletten Service rund um ihren Turmdrehkran. Sie suchen eine Kran zum Kauf oder zur Miete oder einfach nur Ersatzteile?",
+        hinweistext:
           "Fragen Sie bei uns an. Wir haben fast immer das passende Angebot für Sie und können auch kurzfristig helfen.",
-        question: "Sind Sie bereit, Ihr nächstes Projekt zu besprechen?",
+        frage: "Sind Sie bereit, Ihr nächstes Projekt zu besprechen?",
       },
     },
-    transport: {
-      hero: {
-        title: "Krantransporte",
-        subTitle:
+    transportSeite: {
+      introbereich: {
+        titel: "Krantransporte",
+        untertitel:
           "Planung, Genehmigungen sowie Transportbegleitung und Absicherung.",
       },
-      text: "Wir übernehmen Planung, Ausnahmegenehmigungen und Begleitfahrzeuge für Ihren Krantransport",
-      paragraph:
+      leistungsbeschreibung:
+        "Wir übernehmen Planung, Ausnahmegenehmigungen und Begleitfahrzeuge für Ihren Krantransport",
+      hinweistext:
         "Für ein schnelles Angebot senden Sie uns Maße/Gewichte der Komponenten, Abhol- und Zieladresse sowie Ihr Zeitfenster - wir melden uns kurzfristig mit einem Festpreis.",
-      hilfe: {
-        title: "Benötigen Sie zusätzlich die (De-)Montage?",
-        subTitle:
+      hilfebereich: {
+        titel: "Benötigen Sie zusätzlich die (De-)Montage?",
+        untertitel:
           "Unser Team übernimmt die komplette Montage und Demontage Ihres Turmdrehkrans – von der Planung und Baustellenlogistik über Ballastierung und Elektroanschluss bis zur sicheren Abnahme. Kurzfristige Termine möglich.",
       },
     },
-    demontage: {
-      hero: {
-        title: "Montage & Demontage",
-        subTitle:
+    demontageSeite: {
+      introbereich: {
+        titel: "Montage & Demontage",
+        untertitel:
           "Planung, Demontage und Montage sowie Koordination von Autokranen und Ballastierung.",
       },
-      text: "Wir übernehmen Planung, (De-)Montage und Abnahme Ihres Turmdrehkrans – fachgerecht und termingerecht.",
-      paragraph:
+      leistungsbeschreibung:
+        "Wir übernehmen Planung, (De-)Montage und Abnahme Ihres Turmdrehkrans – fachgerecht und termingerecht.",
+      hinweistext:
         "Für ein schnelles Angebot senden Sie uns Kranmodell/Typ, Baustellenadresse, Zugänglichkeit (Autokran-/Stellfläche), ggf. Auslegerlänge/Ballast sowie Ihr Zeitfenster – wir melden uns kurzfristig mit einem Festpreis.",
-      hilfe: {
-        title: "Benötigen Sie einen Krantransport?",
-        subTitle:
+      hilfebereich: {
+        titel: "Benötigen Sie einen Krantransport?",
+        untertitel:
           "Planung, Koordination der Fahrzeuge und Begleitfahrzeuge, abgestimmte Zeitfenster und zuverlässige Zustellung – alles aus einer Hand. Kurzfristige Einsätze möglich.",
       },
     },
-    reparatur: {
-      hero: {
-        title: "Reparatur & Ersatzteile",
-        subTitle:
+    reparaturSeite: {
+      introbereich: {
+        titel: "Reparatur & Ersatzteile",
+        untertitel:
           "Fehlersuche, Reparatur und Service sowie Ersatzteilbeschaffung und Funktionsprüfung.",
       },
-      text: "Wir übernehmen Diagnose, Reparatur und Ersatzteilbeschaffung – schnell und zuverlässig.",
-      paragraph:
+      leistungsbeschreibung:
+        "Wir übernehmen Diagnose, Reparatur und Ersatzteilbeschaffung – schnell und zuverlässig.",
+      hinweistext:
         "Für ein schnelles Angebot senden Sie uns Kranmodell/Typ, Seriennummer, Fehlerbild (kurze Beschreibung/Fotos), Standort sowie Ihr Zeitfenster – wir melden uns kurzfristig mit einem Festpreis.",
     },
   },

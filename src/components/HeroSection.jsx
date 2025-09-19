@@ -12,8 +12,8 @@ import videoWebm from "../assets/video/introVideo.webm";
 
 function HeroSection() {
   const { content } = useContent();
-  const title = content.pages.home.heroSection.title;
-  const subtitle = content.pages.home.heroSection.subTitle;
+  const title = content.seiten.startseite.introbereich.abschnittstitel;
+  const subtitle = content.seiten.startseite.introbereich.abschnittsuntertitel;
 
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef(null);

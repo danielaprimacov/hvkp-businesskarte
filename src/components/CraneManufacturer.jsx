@@ -4,8 +4,8 @@ import { useContent } from "../content/content";
 
 function CraneManufacturer() {
   const { content } = useContent();
-  const title = content.pages.home.craneManufactures.title;
-  const logos = content.pages.home.craneManufactures.logos || [];
+  const title = content.seiten.startseite.kranhersteller.titel;
+  const logos = content.seiten.startseite.kranhersteller.logos || [];
 
   const NORMAL = 60;
   const [duration, setDuration] = useState(NORMAL);

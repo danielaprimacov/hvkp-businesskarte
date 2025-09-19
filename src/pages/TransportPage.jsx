@@ -14,12 +14,12 @@ import questionIcon from "../assets/icons/interrogation.png";
 
 function TransportPage() {
   const { content } = useContent();
-  const title = content.pages.transport.hero.title;
-  const subTitle = content.pages.transport.hero.subTitle;
-  const text = content.pages.transport.text;
-  const paragraph = content.pages.transport.paragraph;
-  const hilfeTitle = content.pages.transport.hilfe.title;
-  const hilfesubTitle = content.pages.transport.hilfe.subTitle;
+  const title = content.seiten.transportSeite.introbereich.titel;
+  const subTitle = content.seiten.transportSeite.introbereich.untertitel;
+  const text = content.seiten.transportSeite.leistungsbeschreibung;
+  const paragraph = content.seiten.transportSeite.hinweistext;
+  const hilfeTitle = content.seiten.transportSeite.hilfebereich.titel;
+  const hilfesubTitle = content.seiten.transportSeite.hilfebereich.untertitel;
 
   const containerRef = useRef(null);
   const sectionRef = useRef(null);

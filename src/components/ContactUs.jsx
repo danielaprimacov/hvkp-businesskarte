@@ -6,9 +6,9 @@ import headOfTheCompanyImg from "../assets/images/boss.jpg";
 
 function ContactUs() {
   const { content } = useContent();
-  const text = content.pages.home.contactSection.text;
-  const paragraph = content.pages.home.contactSection.paragraph;
-  const question = content.pages.home.contactSection.question;
+  const text = content.seiten.startseite.kontaktbereich.leistungsbeschreibung;
+  const paragraph = content.seiten.startseite.kontaktbereich.hinweistext;
+  const question = content.seiten.startseite.kontaktbereich.frage;
 
   return (
     <div className="pt-5">

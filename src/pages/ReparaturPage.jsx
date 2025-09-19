@@ -12,10 +12,10 @@ import arrowsIcon from "../assets/icons/angle-double-small-right.png";
 
 function ReparaturPage() {
   const { content } = useContent();
-  const title = content.pages.reparatur.hero.title;
-  const subTitle = content.pages.reparatur.hero.subTitle;
-  const text = content.pages.reparatur.text;
-  const paragraph = content.pages.reparatur.paragraph;
+   const title = content.seiten.reparaturSeite.introbereich.titel;
+  const subTitle = content.seiten.reparaturSeite.introbereich.untertitel;
+  const text = content.seiten.reparaturSeite.leistungsbeschreibung;
+  const paragraph = content.seiten.reparaturSeite.hinweistext;
 
   const containerRef = useRef(null);
   const sectionRef = useRef(null);

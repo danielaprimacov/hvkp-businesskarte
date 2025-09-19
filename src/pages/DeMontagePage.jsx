@@ -14,12 +14,12 @@ import questionIcon from "../assets/icons/interrogation-montage.png";
 
 function DeMontagePage() {
   const { content } = useContent();
-  const title = content.pages.demontage.hero.title;
-  const subTitle = content.pages.demontage.hero.subTitle;
-  const text = content.pages.demontage.text;
-  const paragraph = content.pages.demontage.paragraph;
-  const hilfeTitle = content.pages.demontage.hilfe.title;
-  const hilfesubTitle = content.pages.demontage.hilfe.subTitle;
+  const title = content.seiten.demontageSeite.introbereich.titel;
+  const subTitle = content.seiten.demontageSeite.introbereich.untertitel;
+  const text = content.seiten.demontageSeite.leistungsbeschreibung;
+  const paragraph = content.seiten.demontageSeite.hinweistext;
+  const hilfeTitle = content.seiten.demontageSeite.hilfebereich.titel;
+  const hilfesubTitle = content.seiten.demontageSeite.hilfebereich.untertitel;
 
   const containerRef = useRef(null);
   const sectionRef = useRef(null);

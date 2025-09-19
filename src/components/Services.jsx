@@ -8,9 +8,11 @@ import reparaturImg from "../assets/images/reparatur-crane.webp";
 
 function Services() {
   const { content } = useContent();
-  const title = content.pages.home.servicesSection.title;
-  const servicesTitle = content.pages.home.servicesSection.serviceTitle;
-  const servicesSubtitle = content.pages.home.servicesSection.serviceSubtitle;
+  const title = content.seiten.startseite.leistungsbereich.titel;
+  const servicesTitle =
+    content.seiten.startseite.leistungsbereich.abschnittstitel;
+  const servicesSubtitle =
+    content.seiten.startseite.leistungsbereich.abschnittsuntertitelTitle;
 
   return (
     <div className="py-10 sm:py-12 md:py-15">
