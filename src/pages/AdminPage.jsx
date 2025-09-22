@@ -119,15 +119,9 @@ function ObjectArrayField({ label, value, onChange }) {
       const result = await uploadToCloudinary(file, {
         folder: "hovekamp/logos",
       });
-      // result.secure_url / result.public_id
       const next = value.map((obj, idx) =>
         idx === i
-          ? {
-              ...obj,
-              url: result.secure_url,
-              publicId: result.public_id,
-              // keep alt untouched; admin can type it
-            }
+          ? { ...obj, url: result.secure_url, publicId: result.public_id }
           : obj
       );
       onChange(next);
@@ -141,20 +135,17 @@ function ObjectArrayField({ label, value, onChange }) {
 
   const handleReplace = (i) => (e) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (file) handlePickFile(i, file);
-    e.target.value = ""; // reset so same file can be picked again
   };
 
   const handleDeleteAsset = async (i) => {
     const obj = value[i] || {};
-    // 1) remove from content immediately
     removeIdx(i);
-    // 2) optionally delete from Cloudinary if publicId present (best-effort)
     if (obj.publicId) {
       try {
         await deleteFromCloudinary(obj.publicId);
       } catch (e) {
-        // not fatal; asset may remain in Cloudinary
         console.warn("Cloudinary delete failed:", e);
       }
     }
@@ -175,7 +166,6 @@ function ObjectArrayField({ label, value, onChange }) {
 
       {errMsg && <div className="mb-2 text-sm text-red-600">{errMsg}</div>}
 
-      {/* responsive cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {value.map((obj, i) => (
           <div key={i} className="rounded-2xl border p-3 bg-white">
@@ -193,7 +183,6 @@ function ObjectArrayField({ label, value, onChange }) {
               </button>
             </div>
 
-            {/* Preview */}
             {obj.url ? (
               <div className="mb-3">
                 <img
@@ -208,7 +197,6 @@ function ObjectArrayField({ label, value, onChange }) {
               </div>
             )}
 
-            {/* Upload / Replace */}
             <div className="mb-3">
               <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
                 <span className="px-3 py-1.5 rounded border hover:bg-gray-50">
@@ -227,19 +215,15 @@ function ObjectArrayField({ label, value, onChange }) {
               </label>
             </div>
 
-            {/* Known fields */}
             <TextField
               label="Alt-Text"
               value={obj.alt ?? ""}
               onChange={(v) => updateItem(i, "alt", v)}
             />
 
-            {/* Readonly info */}
             {obj.publicId && (
               <div className="text-[11px] text-gray-500 break-all">
-                <div>
-                  <b>publicId:</b> {obj.publicId}
-                </div>
+                <b>publicId:</b> {obj.publicId}
               </div>
             )}
           </div>
@@ -249,9 +233,178 @@ function ObjectArrayField({ label, value, onChange }) {
   );
 }
 
-/* ========= Recursive form renderer ========= */
-// Renders any nested shape: strings, string[], object[], nested objects
+/* ========= Services (edit-only, fixed count) ========= */
+function ServicesFieldFixed({ label, value, onChange }) {
+  const [busyIdx, setBusyIdx] = useState(null);
+  const [errMsg, setErrMsg] = useState("");
+
+  const updateItem = (i, patch) =>
+    onChange(value.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
+
+  const clearImage = async (i) => {
+    const current = value[i] || {};
+    const pid = current?.bild?.publicId;
+    updateItem(i, { bild: { url: "", alt: "", publicId: "" } });
+    if (pid) {
+      try {
+        await deleteFromCloudinary(pid);
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  };
+
+  const pickFile = (i) => async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setErrMsg("");
+    setBusyIdx(i);
+    try {
+      const r = await uploadToCloudinary(file, {
+        folder: "hovekamp/leistungen",
+      });
+      updateItem(i, {
+        bild: {
+          url: r.secure_url,
+          publicId: r.public_id,
+          alt: value[i]?.bild?.alt || "",
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      setErrMsg("Upload fehlgeschlagen. Bitte erneut versuchen.");
+    } finally {
+      setBusyIdx(null);
+    }
+  };
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-sm font-medium">{label}</label>
+        <span className="text-xs text-gray-500">
+          Feste Anzahl – Einträge können nur bearbeitet werden.
+        </span>
+      </div>
+
+      {errMsg && <div className="mb-2 text-sm text-red-600">{errMsg}</div>}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {(value || []).map((it, i) => (
+          <div key={i} className="rounded-2xl border p-3 bg-white">
+            <div className="text-sm font-semibold opacity-70 mb-2">
+              Leistung {i + 1}
+            </div>
+
+            <TextField
+              label="Abschnittstitel"
+              value={it.titel || ""}
+              onChange={(v) => updateItem(i, { titel: v })}
+            />
+            <TextField
+              label="Abschnittsuntertitel"
+              value={it.untertitel || ""}
+              onChange={(v) => updateItem(i, { untertitel: v })}
+            />
+
+            {it.bild?.url ? (
+              <div className="mb-3">
+                <img
+                  src={it.bild.url}
+                  alt={it.bild.alt || "Leistungsbild"}
+                  className="h-24 w-auto object-contain"
+                />
+              </div>
+            ) : (
+              <div className="mb-3 text-xs text-gray-500">
+                Kein Bild hochgeladen.
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 mb-3">
+              <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
+                <span className="px-3 py-1.5 rounded border hover:bg-gray-50">
+                  {it.bild?.url ? "Bild ersetzen" : "Bild hochladen"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={pickFile(i)}
+                  disabled={busyIdx === i}
+                />
+                {busyIdx === i && (
+                  <span className="text-xs text-gray-500">Lade hoch…</span>
+                )}
+              </label>
+              {it.bild?.url && (
+                <button
+                  type="button"
+                  onClick={() => clearImage(i)}
+                  className="text-sm px-3 py-1.5 rounded border hover:bg-gray-50 cursor-pointer"
+                  disabled={busyIdx === i}
+                >
+                  Bild entfernen
+                </button>
+              )}
+            </div>
+
+            <TextField
+              label="Alt-Text"
+              value={it.bild?.alt || ""}
+              onChange={(v) =>
+                updateItem(i, { bild: { ...(it.bild || {}), alt: v } })
+              }
+            />
+
+            {it.bild?.publicId && (
+              <div className="text-[11px] text-gray-500 break-all">
+                <b>publicId:</b> {it.bild.publicId}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ========= Recursive renderer ========= */
+function SectionCard({ title, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl border shadow-sm bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen((s) => !s)}
+        className="w-full flex items-center justify-between px-4 py-4 md:py-3 rounded-2xl cursor-pointer"
+      >
+        <span className="text-base md:text-lg font-semibold">{title}</span>
+        <span className="text-lg md:text-sm opacity-60">
+          {open ? "–" : "+"}
+        </span>
+      </button>
+      {open && <div className="px-4 pb-4">{children}</div>}
+    </div>
+  );
+}
+
 function FormRenderer({ node, basePath, update }) {
+  // SPECIAL CASE: fixed services array (edit only)
+  if (
+    Array.isArray(node) &&
+    basePath.endsWith("seiten.startseite.leistungsbereich.leistungen")
+  ) {
+    return (
+      <ServicesFieldFixed
+        label="Leistungen"
+        value={node}
+        onChange={(arr) => update(basePath, arr)}
+      />
+    );
+  }
+
   if (typeof node === "string") {
     return (
       <TextField
@@ -265,14 +418,28 @@ function FormRenderer({ node, basePath, update }) {
   if (Array.isArray(node)) {
     if (isArrayOfStrings(node)) {
       return (
-        <StringArrayField
-          label={titleize(basePath.split(".").slice(-1)[0])}
-          value={node}
-          onChange={(arr) => update(basePath, arr)}
-        />
+        <div className="mb-2">
+          <label className="block text-sm font-medium mb-2">
+            {titleize(basePath.split(".").slice(-1)[0])}
+          </label>
+          {/* Simple string-array editor */}
+          {node.map((v, i) => (
+            <TextField
+              key={i}
+              label={`Eintrag ${i + 1}`}
+              value={v}
+              onChange={(val) => {
+                const next = [...node];
+                next[i] = val;
+                update(basePath, next);
+              }}
+            />
+          ))}
+        </div>
       );
     }
     if (isArrayOfObjects(node)) {
+      // Generic object array — used for logos, etc.
       return (
         <ObjectArrayField
           label={titleize(basePath.split(".").slice(-1)[0])}
@@ -285,7 +452,6 @@ function FormRenderer({ node, basePath, update }) {
   }
 
   if (isObj(node)) {
-    // responsive inner layout: single col on mobile, 2 cols on md+
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {Object.entries(node).map(([k, v]) => {
@@ -311,45 +477,18 @@ function FormRenderer({ node, basePath, update }) {
   return null;
 }
 
-/* ========= Collapsible section card ========= */
-// Collapsed by default; large touch target; responsive spacing
-function SectionCard({ title, children }) {
-  // start closed by default (per your request)
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="rounded-2xl border shadow-sm bg-white">
-      <button
-        type="button"
-        onClick={() => setOpen((s) => !s)}
-        className="w-full flex items-center justify-between px-4 py-4 md:py-3 rounded-2xl cursor-pointer"
-      >
-        <span className="text-base md:text-lg font-semibold">{title}</span>
-        <span className="text-lg md:text-sm opacity-60">
-          {open ? "–" : "+"}
-        </span>
-      </button>
-      {open && <div className="px-4 pb-4">{children}</div>}
-    </div>
-  );
-}
-
-/* ========= Main Admin Page ========= */
+/* ========= Page ========= */
 export default function AdminPage() {
   const { content, update, reset, saving, conflict } = useContent();
-
   const { logout } = useAuth();
 
-  // Build tabs from content.pages
   const pages = content?.seiten || {};
   const pageKeys = useMemo(() => Object.keys(pages), [pages]);
   const [active, setActive] = useState(pageKeys[0] || "startseite");
-
   const ActivePageNode = pages[active];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
-      {/* Fixed top navigation bar */}
       <div className="fixed top-0 left-0 right-0 z-20 backdrop-blur bg-white/80 shadow-sm pb-2">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3">
           <h1 className="text-lg sm:text-xl font-semibold mb-3">
@@ -362,14 +501,14 @@ export default function AdminPage() {
                 : "Gespeichert"}
             </span>
           </h1>
+
           {conflict && (
             <div className="mb-3 text-xs text-red-600">
               Inhalte wurden auf dem Server geändert. Bitte Seite neu laden.
             </div>
           )}
 
-          {/* --- Tabs --- */}
-          {/* Mobile: vertical stacked buttons */}
+          {/* Tabs */}
           <div className="flex flex-col gap-2 sm:hidden mb-3">
             {pageKeys.map((k) => (
               <button
@@ -387,9 +526,8 @@ export default function AdminPage() {
             ))}
           </div>
 
-          {/* Desktop: horizontal row */}
-          <div className="flex items-center justify-between">
-            <div className="hidden sm:flex sm:flex-row sm:items-center sm:gap-2">
+          <div className="hidden sm:flex sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex gap-2">
               {pageKeys.map((k) => (
                 <button
                   key={k}
@@ -405,26 +543,24 @@ export default function AdminPage() {
                 </button>
               ))}
             </div>
-
-            {/* --- Actions --- */}
             <div className="flex gap-2">
               <button
                 onClick={reset}
-                className="px-2 text-xs cursor-pointer hover:text-blue-600 transition duration-300 ease-in sm:px-3 sm:py-2 sm:text-sm"
+                className="px-2 text-xs cursor-pointer hover:text-blue-600 sm:px-3 sm:py-2 sm:text-sm"
                 title="Alle Änderungen zurücksetzen"
               >
                 Zurücksetzen
               </button>
               <button
                 onClick={logout}
-                className="px-2 text-xs cursor-pointer hover:text-blue-600 transition duration-300 ease-in sm:px-3 sm:py-2 sm:text-sm"
+                className="px-2 text-xs cursor-pointer hover:text-blue-600 sm:px-3 sm:py-2 sm:text-sm"
                 title="Abmelden"
               >
                 Abmelden
               </button>
               <Link
                 to="/"
-                className="px-2 py-1.5 text-xs hover:text-blue-600 sm:px-3 transition duration-300 ease-in sm:py-2 sm:text-sm"
+                className="px-2 py-1.5 text-xs hover:text-blue-600 sm:px-3 sm:py-2 sm:text-sm"
                 title="Zurück zur Website"
               >
                 Zurück
@@ -434,10 +570,8 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Add top padding so content is not hidden behind fixed nav */}
       <div className="pt-70 sm:pt-30"></div>
 
-      {/* Active page content area */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6">
         {!ActivePageNode ? (
           <div className="text-gray-600">
@@ -445,7 +579,6 @@ export default function AdminPage() {
           </div>
         ) : (
           <div className="grid gap-5">
-            {/* outer card for the page schema */}
             <SectionCard title={titleize(active)}>
               <FormRenderer
                 node={ActivePageNode}

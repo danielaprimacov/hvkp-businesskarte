@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
 import { fetchContentFromServer, saveContentToServer } from "../lib/cmsApi";
 
-const DEFAULTS_VERSION = 7;
+const DEFAULTS_VERSION = 9;
 
 const defaults = {
   __v: DEFAULTS_VERSION,
@@ -22,15 +22,31 @@ const defaults = {
       },
       leistungsbereich: {
         titel: "Unsere Leistungen",
-        abschnittstitel: [
-          "Krantransporte",
-          "Montage und Demontage",
-          "Reparatur und Ersatzteile",
-        ],
-        abschnittsuntertitelTitle: [
-          "sicher und pünktlich",
-          "fachgerecht und termingerecht",
-          "schnell und zuverlässig",
+        leistungen: [
+          {
+            titel: "Krantransporte",
+            untertitel: "sicher und pünktlich",
+            bild: {
+              url: "/services/transport-crane.webp",
+              alt: "Transport Turmdrehkran",
+            },
+          },
+          {
+            titel: "Montage und Demontage",
+            untertitel: "fachgerecht und termingerecht",
+            bild: {
+              url: "/services/montage-demontage-crane.webp",
+              alt: "Montage oder Demontage Turmdrehkran",
+            },
+          },
+          {
+            titel: "Reparatur und Ersatzteile",
+            untertitel: "schnell und zuverlässig",
+            bild: {
+              url: "/services/reparatur-crane.webp",
+              alt: "Reparatur Turmdrehkran",
+            },
+          },
         ],
       },
       kontaktbereich: {
@@ -90,7 +106,11 @@ const defaults = {
 const isObj = (v) => v && typeof v === "object" && !Array.isArray(v);
 
 function deepMerge(a, b) {
-  if (Array.isArray(a) || Array.isArray(b)) return b !== undefined ? b : a;
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (b === undefined) return a;
+    // Prevent empty arrays from wiping defaults
+    return Array.isArray(b) && b.length === 0 ? a : b;
+  }
   if (isObj(a) && isObj(b)) {
     const out = { ...a };
     for (const k of Object.keys(b)) out[k] = deepMerge(a?.[k], b[k]);
@@ -185,6 +205,13 @@ export function ContentProvider({ children }) {
       try {
         const { body, version } = await fetchContentFromServer();
         const initialOverrides = deepDiff(defaults, normalizeDeep(body)) || {};
+
+        const lb = initial?.seiten?.startseite?.leistungsbereich;
+        if (lb) {
+          delete lb.abschnittstitel;
+          delete lb.abschnittsuntertitel;
+        }
+
         setOverrides(initialOverrides);
         setServerVersion(version);
       } catch (e) {
@@ -245,3 +272,5 @@ export function useContent() {
   if (!ctx) throw new Error("useContent must be used inside ContentProvider");
   return ctx;
 }
+
+export const contentDefaults = defaults;

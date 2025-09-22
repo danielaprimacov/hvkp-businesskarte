@@ -222,7 +222,7 @@ function Navbar() {
                       <Link
                         to={l.to}
                         onClick={closeMenu}
-                        className="block text-2xl font-medium hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 rounded"
+                        className="block text-2xl font-medium hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 rounded"
                       >
                         {l.label}
                       </Link>
@@ -251,7 +251,7 @@ function Navbar() {
                   <Link
                     to="/kontakt"
                     onClick={closeMenu}
-                    className="block text-lg font-medium hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 rounded"
+                    className="block text-lg font-medium hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 rounded"
                   >
                     Kontakt
                   </Link>
