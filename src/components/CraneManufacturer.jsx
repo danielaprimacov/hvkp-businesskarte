@@ -1,4 +1,10 @@
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 
 import { useContent } from "../content/content";
 
@@ -35,39 +41,47 @@ function CraneManufacturer() {
 
   // Measure the width of one full group and ensure we render enough copies
   // so there is no visual gap on very wide screens.
+  const measure = useCallback(() => {
+    const group = groupRef.current;
+    const cont = containerRef.current;
+    if (!group || !cont) return;
+
+    const wGroup = group.getBoundingClientRect().width;
+    const wCont = cont.getBoundingClientRect().width;
+
+    setTrackW(wGroup || 0);
+
+    if (wGroup > 0 && wGroup < wCont) {
+      const needed = Math.max(2, Math.ceil((wCont + wGroup) / wGroup));
+      setCopies(needed);
+    } else {
+      setCopies(2);
+    }
+  }, []);
+
+  // Re-measure on size changes (covers image decode & layout changes in most browsers)
   useLayoutEffect(() => {
     const group = groupRef.current;
     const cont = containerRef.current;
     if (!group || !cont) return;
 
-    const measure = () => {
-      const wGroup = group.getBoundingClientRect().width;
-      const wCont = cont.getBoundingClientRect().width;
-
-      setTrackW(wGroup || 0);
-
-      if (wGroup > 0 && wGroup < wCont) {
-        const needed = Math.max(2, Math.ceil((wCont + wGroup) / wGroup));
-        setCopies(needed);
-      } else {
-        setCopies(2);
-      }
-    };
-
-    // Observe both container and group for any size changes
     const ro = new ResizeObserver(measure);
     ro.observe(group);
     ro.observe(cont);
 
-    // Also try once after next paint in case images are still decoding
+    // Try once on next paint (in case images are still decoding)
     requestAnimationFrame(measure);
 
     return () => ro.disconnect();
-  }, [logos]);
+  }, [measure, logos]);
 
-  // Build the list of groups (original + clones)
+  // Also trigger a measure when an image finishes loading (covers browsers where RO might not fire)
+  const handleImgLoad = () => {
+    // queue after paint to ensure sizes are updated
+    requestAnimationFrame(measure);
+  };
+
   const groups = Array.from({ length: copies }, () => logos);
-
   const ready = trackW > 0 && logos.length > 0;
 
   return (
@@ -81,9 +95,10 @@ function CraneManufacturer() {
           className="inline-flex items-center min-w-max will-change-transform gap-6 sm:gap-10"
           style={{
             ["--track-w"]: `${trackW}px`,
-            animation: ready
-              ? `marquee-x ${duration}s linear infinite`
-              : "none",
+            animationName: ready ? "marquee-x" : "none",
+            animationDuration: `${duration}s`,
+            animationTimingFunction: "linear",
+            animationIterationCount: "infinite",
           }}
         >
           {/* Original group (measured for width) */}
@@ -98,14 +113,16 @@ function CraneManufacturer() {
                   alt={it.alt || "Client logo"}
                   className="h-14 sm:h-16 md:h-24 w-auto object-contain select-none pointer-events-none"
                   draggable="false"
-                  loading="lazy"
+                  loading="eager" // ensure the first track loads immediately
+                  decoding="async"
+                  onLoad={handleImgLoad}
                   onError={(e) => (e.currentTarget.style.opacity = "0.3")}
                 />
               </div>
             ))}
           </div>
 
-          {/* Clones (hidden from a11y; used to make the loop seamless) */}
+          {/* Clones for seamless loop */}
           {groups.slice(1).map((group, gi) => (
             <div
               key={`clone-${gi}`}
@@ -120,6 +137,8 @@ function CraneManufacturer() {
                     className="h-14 sm:h-16 md:h-24 w-auto object-contain select-none pointer-events-none"
                     draggable="false"
                     loading="lazy"
+                    decoding="async"
+                    onLoad={handleImgLoad}
                     onError={(e) => (e.currentTarget.style.opacity = "0.3")}
                   />
                 </div>
