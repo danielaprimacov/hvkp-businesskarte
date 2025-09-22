@@ -36,33 +36,39 @@ function CraneManufacturer() {
   // Measure the width of one full group and ensure we render enough copies
   // so there is no visual gap on very wide screens.
   useLayoutEffect(() => {
-    const measure = () => {
-      const group = groupRef.current;
-      const cont = containerRef.current;
-      if (!group || !cont) return;
+    const group = groupRef.current;
+    const cont = containerRef.current;
+    if (!group || !cont) return;
 
+    const measure = () => {
       const wGroup = group.getBoundingClientRect().width;
       const wCont = cont.getBoundingClientRect().width;
 
-      setTrackW(wGroup);
+      setTrackW(wGroup || 0);
 
-      // If one group is narrower than the container, render more clones
-      // so the belt always covers the viewport plus one extra group for the seam.
-      if (wGroup < wCont) {
+      if (wGroup > 0 && wGroup < wCont) {
         const needed = Math.max(2, Math.ceil((wCont + wGroup) / wGroup));
         setCopies(needed);
       } else {
-        setCopies(2); // original + one clone is enough
+        setCopies(2);
       }
     };
 
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    // Observe both container and group for any size changes
+    const ro = new ResizeObserver(measure);
+    ro.observe(group);
+    ro.observe(cont);
+
+    // Also try once after next paint in case images are still decoding
+    requestAnimationFrame(measure);
+
+    return () => ro.disconnect();
   }, [logos]);
 
   // Build the list of groups (original + clones)
   const groups = Array.from({ length: copies }, () => logos);
+
+  const ready = trackW > 0 && logos.length > 0;
 
   return (
     <div className="pb-15 relative overflow-hidden">
@@ -71,11 +77,13 @@ function CraneManufacturer() {
       </h1>
       <div ref={containerRef} className="overflow-hidden px-4 sm:px-0">
         <div
+          key={`${trackW}-${duration}`} // restart animation when width/duration changes
           className="inline-flex items-center min-w-max will-change-transform gap-6 sm:gap-10"
           style={{
-            // Slide exactly one group width; clones cover the seam seamlessly.
             ["--track-w"]: `${trackW}px`,
-            animation: `marquee-x ${duration}s linear infinite`,
+            animation: ready
+              ? `marquee-x ${duration}s linear infinite`
+              : "none",
           }}
         >
           {/* Original group (measured for width) */}
