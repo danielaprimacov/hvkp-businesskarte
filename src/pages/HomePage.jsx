@@ -1,5 +1,5 @@
 import ContactUs from "../components/ContactUs";
-import CraneManufacturer from "../components/CraneManufacturer";
+import Bildergalerie from "../components/Bildergalerie";
 import HeroSection from "../components/HeroSection";
 import Services from "../components/Services";
 
@@ -7,7 +7,7 @@ function HomePage() {
   return (
     <>
       <HeroSection />
-      <CraneManufacturer />
+      <Bildergalerie />
       <Services />
       <ContactUs />
     </>

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
 import { fetchContentFromServer, saveContentToServer } from "../lib/cmsApi";
 
-const DEFAULTS_VERSION = 9;
+const DEFAULTS_VERSION = 11;
 
 const defaults = {
   __v: DEFAULTS_VERSION,
@@ -13,11 +13,22 @@ const defaults = {
         abschnittsuntertitel:
           "Planung, Montage, Logistik – alles aus einer Hand",
       },
-      kranhersteller: {
-        titel: "Unsere Kranmarken",
-        logos: [
-          { url: "/logos/Liebherr-Logo.png", alt: "Liebherr Logo" },
-          { url: "/logos/Potain-Logo.png", alt: "Potain Logo" },
+      bildergalerie: {
+        titel: "Bildergalerie",
+        bilder: [
+          { url: "/bilder/bild-1.webp", alt: "Turmdrehkrane Bild 1" },
+          { url: "/bilder/bild-2.webp", alt: "Turmdrehkrane Bild 2" },
+          { url: "/bilder/bild-3.webp", alt: "Turmdrehkrane Bild 3" },
+          { url: "/bilder/bild-4.webp", alt: "Turmdrehkrane Bild 4" },
+          { url: "/bilder/bild-5.webp", alt: "Turmdrehkrane Bild 5" },
+          { url: "/bilder/bild-6.webp", alt: "Turmdrehkrane Bild 6" },
+          { url: "/bilder/bild-7.webp", alt: "Turmdrehkrane Bild 7" },
+          { url: "/bilder/bild-8.webp", alt: "Turmdrehkrane Bild 8" },
+          { url: "/bilder/bild-9.webp", alt: "Turmdrehkrane Bild 9" },
+          { url: "/bilder/bild-10.webp", alt: "Turmdrehkrane Bild 10" },
+          { url: "/bilder/bild-11.webp", alt: "Turmdrehkrane Bild 11" },
+          { url: "/bilder/bild-12.webp", alt: "Turmdrehkrane Bild 12" },
+          { url: "/bilder/bild-13.webp", alt: "Turmdrehkrane Bild 13" },
         ],
       },
       leistungsbereich: {

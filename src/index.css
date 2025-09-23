@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @keyframes marquee-x {
-  0% {
-    transform: translateX(0);
+  from {
+    transform: translate3d(0, 0, 0);
   }
-  100% {
-    transform: translateX(calc(-1 * var(--track-w, 0px)));
+  to {
+    transform: translate3d(calc(-1 * var(--track-w)), 0, 0);
   }
 }
