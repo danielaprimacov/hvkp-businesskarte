@@ -5,6 +5,8 @@ import { useContent } from "../content/content";
 import Modal from "./ui/Modal";
 import OfferForm from "./OfferForm";
 
+import tuvImg from "../assets/images/tuv.png";
+
 import playIcon from "../assets/icons/play.png";
 import stopIcon from "../assets/icons/stop-circle.png";
 import videoMp4 from "../assets/video/introVideo.mp4";
@@ -56,7 +58,7 @@ function HeroSection() {
           Ihr Browser unterstützt das HTML5-Video nicht.
         </video>
         <button
-          className="absolute bottom-4 left-3 sm:bottom-5 sm:left-4 z-20 cursor-pointer"
+          className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 cursor-pointer"
           onClick={togglePlay}
         >
           {playing ? (
@@ -81,6 +83,14 @@ function HeroSection() {
         >
           Angebot anfordern
         </button>
+
+        <img
+          src={tuvImg}
+          alt="TÜV Zertifikat"
+          className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-6 md:right-6 h-36 sm:h-42 md:h-48 lg:h-56 w-auto z-20 select-none pointer-events-none"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
 
       <div

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 import { useContent } from "../content/content";
 
-import headOfTheCompanyImg from "../assets/images/boss.jpg";
+import companyImg from "../assets/images/Kran.jpg";
 
 function ContactUs() {
   const { content } = useContent();
@@ -12,15 +12,15 @@ function ContactUs() {
 
   return (
     <div className="pt-5">
-      <div className="px-4 sm:px-6 md:px-10 pb-12 md:pb-30 flex flex-col md:flex-row md:justify-evenly items-center md:items-center gap-6 sm:gap-8 md:gap-10">
+      <div className="px-4 sm:px-6 md:px-10 pb-12 md:pb-30 flex flex-col md:flex-row md:justify-between items-center md:items-center gap-6 sm:gap-8 md:gap-10">
         <img
-          src={headOfTheCompanyImg}
-          className="w-full max-w-[20rem] sm:max-w-[24rem] md:max-w-none h-64 sm:h-80 md:h-[30rem] object-cover rounded-md shadow-sm"
-          alt="Unternehmensleiter Kontakt"
+          src={companyImg}
+          className="w-full max-w-[40rem] md:max-w-none h-64 sm:h-80 md:h-[25rem] object-cover rounded-md shadow-sm mx-auto"
+          alt="Unternehmen Kontakt"
           loading="lazy"
         />
-        <section className="flex flex-col justify-center items-center gap-4 sm:gap-5 text-center">
-          <div className="w-full max-w-[38rem] md:w-150 text-base sm:text-lg md:text-xl text-black/70">
+        <section className="w-full max-w-[40rem] md:max-w-none flex flex-col justify-center items-center gap-4 sm:gap-5 text-center mx-auto">
+          <div className="md:w-150 text-base sm:text-lg md:text-xl text-black/70">
             {text}
             <div className="pt-5">{paragraph}</div>
           </div>
