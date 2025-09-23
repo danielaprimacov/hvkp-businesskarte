@@ -63,7 +63,7 @@ function ContactPage() {
               </span>
             </a>
 
-            <p className="mt-1">E: hovekamp@email.com</p>
+            <p className="mt-1">E: michael@hovekamp.eu</p>
 
             <MapLink address={ADDRESS} className="group inline-block mt-3">
               {/* Line 1 */}
