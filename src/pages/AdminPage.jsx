@@ -477,7 +477,36 @@ function FormRenderer({ node, basePath, update }) {
   return null;
 }
 
-/* ========= Page ========= */
+/* ========= Actions ========= */
+function ActionsRow({ reset, logout }) {
+  return (
+    <>
+      <button
+        onClick={reset}
+        className="px-3 py-2 rounded border border-transparent hover:bg-gray-50 text-sm cursor-pointer w-full sm:w-auto"
+        title="Alle Änderungen zurücksetzen"
+      >
+        Zurücksetzen
+      </button>
+      <button
+        onClick={logout}
+        className="px-3 py-2 rounded border border-transparent hover:bg-gray-50 text-sm cursor-pointer w-full sm:w-auto"
+        title="Abmelden"
+      >
+        Abmelden
+      </button>
+      <Link
+        to="/"
+        className="px-3 py-2 rounded border border-transparent hover:bg-gray-50 text-sm cursor-pointer text-center w-full sm:w-auto"
+        title="Zurück zur Website"
+      >
+        Zurück
+      </Link>
+    </>
+  );
+}
+
+/* ========= Admin Page ========= */
 export default function AdminPage() {
   const { content, update, reset, saving, conflict } = useContent();
   const { logout } = useAuth();
@@ -508,25 +537,34 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Tabs */}
-          <div className="flex flex-col gap-2 sm:hidden mb-3">
-            {pageKeys.map((k) => (
-              <button
-                key={k}
-                onClick={() => setActive(k)}
-                className={
-                  "px-3 py-2 rounded-full text-sm border transition text-left cursor-pointer " +
-                  (active === k
-                    ? "bg-blue-600 text-white border-blue-600 shadow"
-                    : "bg-white hover:bg-blue-50")
-                }
-              >
-                {titleize(k)}
-              </button>
-            ))}
+          {/* Mobile: tabs + actions */}
+          <div className="sm:hidden mb-3 space-y-3">
+            {/* Tabs (stacked) */}
+            <div className="flex flex-col gap-2">
+              {pageKeys.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setActive(k)}
+                  className={
+                    "px-3 py-2 rounded-full text-sm border-transparent transition text-left cursor-pointer " +
+                    (active === k
+                      ? "bg-blue-600 text-white border-blue-600 shadow"
+                      : "bg-white hover:bg-blue-50")
+                  }
+                >
+                  {titleize(k)}
+                </button>
+              ))}
+            </div>
+
+            {/* Actions (neat 3-column grid) */}
+            <div className="grid grid-cols-3 gap-2">
+              <ActionsRow reset={reset} logout={logout} />
+            </div>
           </div>
 
-          <div className="hidden sm:flex sm:flex-row sm:items-center sm:justify-between">
+          {/* Desktop: tabs left, actions right */}
+          <div className="hidden sm:flex sm:items-center sm:justify-between">
             <div className="flex gap-2">
               {pageKeys.map((k) => (
                 <button
@@ -544,27 +582,7 @@ export default function AdminPage() {
               ))}
             </div>
             <div className="flex gap-2">
-              <button
-                onClick={reset}
-                className="px-2 text-xs cursor-pointer hover:text-blue-600 sm:px-3 sm:py-2 sm:text-sm"
-                title="Alle Änderungen zurücksetzen"
-              >
-                Zurücksetzen
-              </button>
-              <button
-                onClick={logout}
-                className="px-2 text-xs cursor-pointer hover:text-blue-600 sm:px-3 sm:py-2 sm:text-sm"
-                title="Abmelden"
-              >
-                Abmelden
-              </button>
-              <Link
-                to="/"
-                className="px-2 py-1.5 text-xs hover:text-blue-600 sm:px-3 sm:py-2 sm:text-sm"
-                title="Zurück zur Website"
-              >
-                Zurück
-              </Link>
+              <ActionsRow reset={reset} logout={logout} />
             </div>
           </div>
         </div>
