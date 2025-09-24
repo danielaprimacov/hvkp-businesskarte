@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
 import { fetchContentFromServer, saveContentToServer } from "../lib/cmsApi";
 
-const DEFAULTS_VERSION = 11;
+const DEFAULTS_VERSION = 12;
 
 const defaults = {
   __v: DEFAULTS_VERSION,
@@ -29,6 +29,11 @@ const defaults = {
           { url: "/bilder/bild-11.webp", alt: "Turmdrehkrane Bild 11" },
           { url: "/bilder/bild-12.webp", alt: "Turmdrehkrane Bild 12" },
           { url: "/bilder/bild-13.webp", alt: "Turmdrehkrane Bild 13" },
+          { url: "/bilder/bild-14.webp", alt: "Turmdrehkrane Bild 14" },
+          { url: "/bilder/bild-15.webp", alt: "Turmdrehkrane Bild 15" },
+          { url: "/bilder/bild-16.webp", alt: "Turmdrehkrane Bild 16" },
+          { url: "/bilder/bild-17.webp", alt: "Turmdrehkrane Bild 17" },
+          { url: "/bilder/bild-18.webp", alt: "Turmdrehkrane Bild 18" },
         ],
       },
       leistungsbereich: {
@@ -51,11 +56,11 @@ const defaults = {
             },
           },
           {
-            titel: "Reparatur und Ersatzteile",
+            titel: "Reparatur, Ersatzteile und TÜV",
             untertitel: "schnell und zuverlässig",
             bild: {
               url: "/services/reparatur-crane.webp",
-              alt: "Reparatur Turmdrehkran",
+              alt: "Reparatur Turmdrehkran, TÜV",
             },
           },
         ],
@@ -102,14 +107,35 @@ const defaults = {
     },
     reparaturSeite: {
       introbereich: {
-        titel: "Reparatur & Ersatzteile",
+        titel: "Reparatur, Ersatzteile & TÜV",
         untertitel:
-          "Fehlersuche, Reparatur und Service sowie Ersatzteilbeschaffung und Funktionsprüfung.",
+          "Fehlersuche, Instandsetzung und Ersatzteilbeschaffung – inklusive Funktionsprüfung und Abnahme­vorbereitung.",
       },
       leistungsbeschreibung:
         "Wir übernehmen Diagnose, Reparatur und Ersatzteilbeschaffung – schnell und zuverlässig.",
       hinweistext:
         "Für ein schnelles Angebot senden Sie uns Kranmodell/Typ, Seriennummer, Fehlerbild (kurze Beschreibung/Fotos), Standort sowie Ihr Zeitfenster – wir melden uns kurzfristig mit einem Festpreis.",
+      tuvbereich: {
+        titel: "Prüfung",
+        untertitel: "Wiederkehrende Prüfungen, Abnahmen und Dokumentation.",
+        beschreibung:
+          "Wir organisieren und begleiten wiederkehrende, außerordentliche und Abnahme-Prüfungen an Turmdrehkranen – mit Prüfprotokoll, Fotodokumentation und klaren Empfehlungen.",
+        pruefpunkte: [
+          "Tragstruktur & Verbindungen",
+          "Antriebe, Bremsen & Endanschläge",
+          "Seile, Rollen & Hakenflasche",
+          "Sicherheitseinrichtungen (z. B. LMB, Not-Aus, Endschalter)",
+          "Elektrik/Schutz und Einspeisung",
+          "Fundament, Abstützung & Verankerungen",
+          "Vollständigkeit der Gerätedokumente",
+        ],
+        ergebnis: [
+          "Prüfprotokoll und Mängelliste",
+          "Priorisierte Handlungsempfehlungen",
+          "Koordination der Abnahme mit z. B. TÜV auf Wunsch",
+        ],
+        callToAction: "Prüfung anfragen",
+      },
     },
   },
 };

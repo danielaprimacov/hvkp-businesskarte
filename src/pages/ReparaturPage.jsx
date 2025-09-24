@@ -12,10 +12,16 @@ import arrowsIcon from "../assets/icons/angle-double-small-right.png";
 
 function ReparaturPage() {
   const { content } = useContent();
-   const title = content.seiten.reparaturSeite.introbereich.titel;
+  const title = content.seiten.reparaturSeite.introbereich.titel;
   const subTitle = content.seiten.reparaturSeite.introbereich.untertitel;
   const text = content.seiten.reparaturSeite.leistungsbeschreibung;
   const paragraph = content.seiten.reparaturSeite.hinweistext;
+
+  const tuv = content?.seiten?.reparaturSeite?.tuvbereich || {};
+  const tuvTitle = tuv.titel || "Prüfung & Abnahme von Turmdrehkranen";
+  const tuvParagraph =
+    tuv.text ||
+    "Wir führen wiederkehrende, außerordentliche sowie Abnahme-Prüfungen an Turmdrehkranen durch – mit Prüfprotokoll, Fotodokumentation und klaren Handlungsempfehlungen. Auf Wunsch koordinieren wir die Abnahme durch eine zugelassene Überwachungsstelle (z. B. TÜV, DEKRA).";
 
   const containerRef = useRef(null);
   const sectionRef = useRef(null);
@@ -86,6 +92,14 @@ function ReparaturPage() {
             </p>
             <p className="w-full max-w-4xl md:max-w-[70rem] mb-8 sm:mb-10 text-center text-base sm:text-lg md:text-xl px-1">
               {paragraph}
+            </p>
+
+            <p className="w-full max-w-3xl sm:max-w-4xl md:max-w-[60rem] mb-6 sm:mb-8 md:mb-10 text-2xl sm:text-3xl md:text-3xl/13 uppercase font-bold text-center">
+              {tuvTitle}
+            </p>
+            {/* 4) body paragraph (Prüfung) — same structure */}
+            <p className="w-full max-w-4xl md:max-w-[70rem] mb-8 sm:mb-10 text-center text-base sm:text-lg md:text-xl px-1">
+              {tuvParagraph}
             </p>
 
             <button

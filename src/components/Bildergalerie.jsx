@@ -108,7 +108,7 @@ function Bildergalerie() {
                 <img
                   src={it.url}
                   alt=""
-                  className="h-20 sm:h-24 md:h-28 w-auto object-contain select-none pointer-events-none"
+                  className="h-40 sm:h-54 md:h-68 w-auto object-contain select-none pointer-events-none rounded"
                   draggable="false"
                   loading="lazy"
                   decoding="async"

@@ -2,10 +2,6 @@ import { Link } from "react-router-dom";
 
 import { useContent, contentDefaults } from "../content/content";
 
-// import transportImg from "../assets/images/transport-crane.webp";
-// import montageDemontageImg from "../assets/images/montage-demontage-crane.webp";
-// import reparaturImg from "../assets/images/reparatur-crane.webp";
-
 function Services() {
   const { content } = useContent();
 
