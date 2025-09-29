@@ -6,16 +6,16 @@ import { useContent } from "../content/content";
 import Modal from "../components/ui/Modal";
 import OfferForm from "../components/OfferForm";
 
-import reparaturBackground from "../assets/images/reparatur.jpg";
-import arrowDownIcon from "../assets/icons/arrow-circle-down-reparatur.png";
+import pruefungBackground from "../assets/images/kran-pruefung.jpg";
+import arrowDownIcon from "../assets/icons/arrow-circle-down-pruefung.png";
 import arrowsIcon from "../assets/icons/angle-double-small-right.png";
 
-function ReparaturPage() {
+function PruefungPage() {
   const { content } = useContent();
-  const title = content.seiten.reparaturSeite.introbereich.titel;
-  const subTitle = content.seiten.reparaturSeite.introbereich.untertitel;
-  const text = content.seiten.reparaturSeite.leistungsbeschreibung;
-  const paragraph = content.seiten.reparaturSeite.hinweistext;
+  const title = content.seiten.prufungSeite.introbereich.titel;
+  const subTitle = content.seiten.prufungSeite.introbereich.untertitel;
+  const text = content.seiten.prufungSeite.leistungsbeschreibung;
+  const paragraph = content.seiten.prufungSeite.hinweistext;
 
   const containerRef = useRef(null);
   const sectionRef = useRef(null);
@@ -42,8 +42,8 @@ function ReparaturPage() {
           <motion.img
             style={{ opacity: imgOpacity, y: imgY }}
             className="absolute inset-0 h-full w-full object-cover will-change-transform"
-            src={reparaturBackground}
-            alt="Reparatur Background Image"
+            src={pruefungBackground}
+            alt="Pruefung Background Image"
             loading="eager"
           />
           <div className="absolute inset-0 bg-black/30" />
@@ -59,7 +59,7 @@ function ReparaturPage() {
             </motion.div>
           </div>
           <a
-            href="#reparatur-info"
+            href="#pruefung-info"
             aria-label="Scroll down"
             className="group absolute left-1/2 -translate-x-1/2 bottom-4 sm:bottom-6 z-20 inline-flex h-14 w-10 sm:h-20 sm:w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition"
           >
@@ -78,7 +78,7 @@ function ReparaturPage() {
         </section>
         <section
           className="mt-16 sm:mt-24 md:mt-40 pt-6 md:pt-10 mb-12 md:mb-20 scroll-mt-20 sm:scroll-mt-24"
-          id="reparatur-info"
+          id="pruefung-info"
         >
           <div className="flex flex-col justify-center items-center px-4">
             <p className="w-full max-w-3xl sm:max-w-4xl md:max-w-[60rem] mb-6 sm:mb-8 md:mb-10 text-2xl sm:text-3xl md:text-3xl/13 uppercase font-bold text-center">
@@ -90,7 +90,7 @@ function ReparaturPage() {
 
             <button
               onClick={() => setIsOpen(true)}
-              className="mt-2 sm:mt-3 md:mt-5 px-5 sm:px-6 py-2 flex gap-2 sm:gap-3 rounded-md text-white text-base sm:text-lg md:text-xl tracking-wider uppercase bg-[#4d898a] transition duration-300 hover:scale-110 ease-in cursor-pointer"
+              className="mt-2 sm:mt-3 md:mt-5 px-5 sm:px-6 py-2 flex gap-2 sm:gap-3 rounded-md text-white text-base sm:text-lg md:text-xl tracking-wider uppercase bg-[#9f7850] transition duration-300 hover:scale-110 ease-in cursor-pointer"
             >
               Angebot anfordern
               <img
@@ -103,10 +103,10 @@ function ReparaturPage() {
         </section>
       </div>
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <OfferForm onClose={() => setIsOpen(false)} variant="repair" />
+        <OfferForm onClose={() => setIsOpen(false)} variant="pruefung" />
       </Modal>
     </>
   );
 }
 
-export default ReparaturPage;
+export default PruefungPage;

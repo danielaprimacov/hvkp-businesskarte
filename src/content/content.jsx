@@ -56,11 +56,19 @@ const defaults = {
             },
           },
           {
-            titel: "Reparatur, Ersatzteile und TÜV",
+            titel: "Reparatur und Ersatzteile",
             untertitel: "schnell und zuverlässig",
             bild: {
               url: "/services/reparatur-crane.webp",
-              alt: "Reparatur Turmdrehkran, TÜV",
+              alt: "Reparatur Turmdrehkran",
+            },
+          },
+          {
+            titel: "Prüfung",
+            untertitel: "vorschriftsgemäß und dokumentiert",
+            bild: {
+              url: "/services/pruefung.png",
+              alt: "Prüfung Turmdrehkran",
             },
           },
         ],
@@ -107,35 +115,24 @@ const defaults = {
     },
     reparaturSeite: {
       introbereich: {
-        titel: "Reparatur, Ersatzteile & TÜV",
+        titel: "Reparatur & Ersatzteile",
         untertitel:
-          "Fehlersuche, Instandsetzung und Ersatzteilbeschaffung – inklusive Funktionsprüfung und Abnahme­vorbereitung.",
+          "Fehlersuche, Reparatur und Service sowie Ersatzteilbeschaffung und Funktionsprüfung.",
       },
       leistungsbeschreibung:
         "Wir übernehmen Diagnose, Reparatur und Ersatzteilbeschaffung – schnell und zuverlässig.",
       hinweistext:
         "Für ein schnelles Angebot senden Sie uns Kranmodell/Typ, Seriennummer, Fehlerbild (kurze Beschreibung/Fotos), Standort sowie Ihr Zeitfenster – wir melden uns kurzfristig mit einem Festpreis.",
-      tuvbereich: {
-        titel: "Prüfung",
-        untertitel: "Wiederkehrende Prüfungen, Abnahmen und Dokumentation.",
-        beschreibung:
-          "Wir organisieren und begleiten wiederkehrende, außerordentliche und Abnahme-Prüfungen an Turmdrehkranen – mit Prüfprotokoll, Fotodokumentation und klaren Empfehlungen.",
-        pruefpunkte: [
-          "Tragstruktur & Verbindungen",
-          "Antriebe, Bremsen & Endanschläge",
-          "Seile, Rollen & Hakenflasche",
-          "Sicherheitseinrichtungen (z. B. LMB, Not-Aus, Endschalter)",
-          "Elektrik/Schutz und Einspeisung",
-          "Fundament, Abstützung & Verankerungen",
-          "Vollständigkeit der Gerätedokumente",
-        ],
-        ergebnis: [
-          "Prüfprotokoll und Mängelliste",
-          "Priorisierte Handlungsempfehlungen",
-          "Koordination der Abnahme mit z. B. TÜV auf Wunsch",
-        ],
-        callToAction: "Prüfung anfragen",
+    },
+    prufungSeite: {
+      introbereich: {
+        titel: "Wiederkehrende Prüfung",
+        untertitel: "Wiederkehrend, außerordentlich & Abnahme.",
       },
+      leistungsbeschreibung:
+        "Wir prüfen Turmdrehkrane nach geltenden Vorgaben: Sicht- und Funktionsprüfung von Tragwerk, Ausleger, Drehwerk, Seilen/Haken, Endschaltern und Sicherheitseinrichtungen – mit Prüfprotokoll, Fotodokumentation und klaren Empfehlungen.",
+      hinweistext:
+        "Für ein Angebot bitte angeben: Kranmodell/Typ, Seriennummer, Standort, gewünschte Prüfart (wiederkehrend/außerordentlich/Abnahme), letzter Prüfbericht (falls vorhanden) sowie Ihr Zeitfenster und Ansprechpartner. Wir melden uns kurzfristig mit einem Festpreis.",
     },
   },
 };
@@ -241,14 +238,16 @@ export function ContentProvider({ children }) {
     (async () => {
       try {
         const { body, version } = await fetchContentFromServer();
-        const initialOverrides = deepDiff(defaults, normalizeDeep(body)) || {};
-
-        const lb = initial?.seiten?.startseite?.leistungsbereich;
+        // sanitize server body (remove legacy fields)
+        const cleanBody = normalizeDeep(body);
+        const lb = cleanBody?.seiten?.startseite?.leistungsbereich;
         if (lb) {
           delete lb.abschnittstitel;
           delete lb.abschnittsuntertitel;
         }
 
+        // now diff against defaults
+        const initialOverrides = deepDiff(defaults, cleanBody) || {};
         setOverrides(initialOverrides);
         setServerVersion(version);
       } catch (e) {

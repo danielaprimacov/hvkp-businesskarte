@@ -6,6 +6,7 @@ import DeMontagePage from "./pages/DeMontagePage";
 import HomePage from "./pages/HomePage";
 import ReparaturPage from "./pages/ReparaturPage";
 import TransportPage from "./pages/TransportPage";
+import PruefungPage from "./pages/PruefungPage";
 import AdminPage from "./pages/AdminPage";
 import AdminLogin from "./pages/AdminLogin";
 import ImpressumPage from "./pages/ImpressumPage";
@@ -20,6 +21,7 @@ function App() {
         <Route path="/transport" element={<TransportPage />} />
         <Route path="/de-montage" element={<DeMontagePage />} />
         <Route path="/reparatur" element={<ReparaturPage />} />
+        <Route path="/wiederkehrende-pruefung" element={<PruefungPage />} />
         <Route path="/kontakt" element={<ContactPage />} />
         <Route path="/impressum" element={<ImpressumPage />} />
       </Route>

@@ -22,6 +22,10 @@ function OfferForm({ onClose, variant = "general" }) {
     craneManufacturers: "",
     constructionYear: "",
     siteAddress: "", // montage / repair
+    // pruefung
+    inspectionType: "", // "wiederkehrend" | "ausserordentlich" | "abnahme"
+    lastInspectionDate: "", // yyyy-mm-dd
+    preferredDateWindow: "", // free text
   };
 
   const TITLES = {
@@ -29,6 +33,7 @@ function OfferForm({ onClose, variant = "general" }) {
     transport: "Angebot für Krantransport",
     montage: "Angebot für (De-)Montage",
     repair: "Angebot für Reparatur & Ersatzteile",
+    pruefung: "Angebot für Wiederkehrende Prüfung",
   };
 
   const [form, setForm] = useState(initialState);
@@ -61,13 +66,6 @@ function OfferForm({ onClose, variant = "general" }) {
     if (!f.email.trim()) e.email = "Bitte geben Sie Ihre E-Mail ein.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email))
       e.email = "Bitte geben Sie eine gültige E-Mail ein.";
-
-    // dimensions
-    const dims = [
-      "heightOfTheConstruction",
-      "widthOfTheConstruction",
-      "lengthOfTheConstruction",
-    ];
 
     // dimensions: for general (required)
     if (variant === "general") {
@@ -123,6 +121,19 @@ function OfferForm({ onClose, variant = "general" }) {
         e.siteAddress = "Standortadresse erforderlich.";
       if (!f.problemDescription?.trim())
         e.problemDescription = "Bitte schildern Sie das Problem.";
+    }
+
+    // pruefung
+    if (variant === "pruefung") {
+      if (!f.craneModel.trim()) e.craneModel = "Kranmodell/Typ erforderlich.";
+      if (!f.craneManufacturers.trim())
+        e.craneManufacturers = "Kranhersteller erforderlich.";
+      const yErr = checkYear();
+      if (yErr) e.constructionYear = yErr;
+      if (!f.siteAddress.trim())
+        e.siteAddress = "Standortadresse erforderlich.";
+      if (!f.inspectionType) e.inspectionType = "Bitte Prüfungsart auswählen.";
+      // dates/notes are optional
     }
 
     return e;
@@ -183,6 +194,7 @@ function OfferForm({ onClose, variant = "general" }) {
   const isTransport = variant === "transport";
   const isMontage = variant === "montage";
   const isRepair = variant === "repair";
+  const isPruefung = variant === "pruefung";
 
   return (
     <form
@@ -329,7 +341,7 @@ function OfferForm({ onClose, variant = "general" }) {
         </div>
       )}
 
-      {(isTransport || isMontage || isRepair) && (
+      {(isTransport || isMontage || isRepair || isPruefung) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="relative">
             <input
@@ -346,8 +358,7 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="craneModel"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Kranmodell/Typ *
             </label>
@@ -371,8 +382,7 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="craneManufacturers"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Kranhersteller *
             </label>
@@ -405,8 +415,7 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="constructionYear"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Baujahr *
             </label>
@@ -419,6 +428,7 @@ function OfferForm({ onClose, variant = "general" }) {
         </div>
       )}
 
+      {/* Transport-only addresses */}
       {isTransport && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div className="relative">
@@ -436,8 +446,7 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="pickupAddress"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Abholadresse *
             </label>
@@ -463,8 +472,7 @@ function OfferForm({ onClose, variant = "general" }) {
             />
             <label
               htmlFor="destinationAddress"
-              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                         peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
             >
               Zieladresse *
             </label>
@@ -477,6 +485,7 @@ function OfferForm({ onClose, variant = "general" }) {
         </div>
       )}
 
+      {/* Montage / Repair require a site address */}
       {(isMontage || isRepair) && (
         <div className="relative">
           <input
@@ -493,8 +502,7 @@ function OfferForm({ onClose, variant = "general" }) {
           />
           <label
             htmlFor="siteAddress"
-            className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                       peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+            className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
           >
             Baustellenadresse *
           </label>
@@ -504,16 +512,134 @@ function OfferForm({ onClose, variant = "general" }) {
         </div>
       )}
 
+      {/* --- NEW: Prüfung fields --- */}
+      {isPruefung && (
+        <>
+          <div className="relative">
+            <input
+              id="siteAddress"
+              name="siteAddress"
+              value={form.siteAddress}
+              onChange={handleChange}
+              required
+              placeholder=" "
+              className={fieldClass(errors.siteAddress)}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+            />
+            <label
+              htmlFor="siteAddress"
+              className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+            >
+              Standortadresse *
+            </label>
+            {errors.siteAddress && (
+              <p className="mt-1 text-sm text-red-600">{errors.siteAddress}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div className="relative">
+              <select
+                id="inspectionType"
+                name="inspectionType"
+                value={form.inspectionType || ""}
+                onChange={handleChange}
+                required
+                aria-invalid={!form.inspectionType}
+                className={[
+                  "block w-full h-12 bg-transparent border-b text-base focus:outline-none focus:ring-0 transition",
+                  errors.inspectionType
+                    ? "border-red-500 focus:border-red-600"
+                    : "border-b-black/20 focus:border-black",
+                  !form.inspectionType ? "text-gray-500" : "text-black",
+                ].join(" ")}
+              >
+                <option value="" disabled>
+                  Bitte wählen…
+                </option>
+                <option value="wiederkehrend">Wiederkehrend</option>
+                <option value="ausserordentlich">Außerordentlich</option>
+                <option value="abnahme">Abnahme</option>
+              </select>
+              <label
+                htmlFor="inspectionType"
+                className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              >
+                Prüfungsart *
+              </label>
+              {errors.inspectionType && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.inspectionType}
+                </p>
+              )}
+            </div>
+
+            <div className="relative">
+              <input
+                id="lastInspectionDate"
+                name="lastInspectionDate"
+                type="date"
+                value={form.lastInspectionDate}
+                onChange={handleChange}
+                placeholder=" "
+                className={fieldClass(false)}
+              />
+              <label
+                htmlFor="lastInspectionDate"
+                className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              >
+                Letzte Prüfung (optional)
+              </label>
+            </div>
+
+            <div className="relative">
+              <input
+                id="preferredDateWindow"
+                name="preferredDateWindow"
+                value={form.preferredDateWindow}
+                onChange={handleChange}
+                placeholder=" "
+                className={fieldClass(false)}
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+              />
+              <label
+                htmlFor="preferredDateWindow"
+                className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
+              >
+                Wunschtermin / Zeitfenster
+              </label>
+            </div>
+          </div>
+
+          <label className="inline-flex items-center gap-3 select-none">
+            <input
+              type="checkbox"
+              name="lastReportAvailable"
+              checked={!!form.lastReportAvailable}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-gray-300 accent-blue-400"
+            />
+            <span className="text-sm text-gray-700">
+              Letzter Prüfbericht vorhanden
+            </span>
+          </label>
+        </>
+      )}
+
+      {/* General-only dimension fields */}
       {isGeneral && (
         <>
           <div className="text-sm text-gray-600">
             <p>
-              *Bitte tragen Sie die Abmessungen der <strong> Baustelle</strong>{" "}
+              *Bitte tragen Sie die Abmessungen der <strong>Baustelle</strong>{" "}
               ein.
             </p>
           </div>
 
-          {/* Höhe / Breite / Länge */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <div className="relative">
               <input
@@ -529,14 +655,8 @@ function OfferForm({ onClose, variant = "general" }) {
                 className={`${fieldClass(
                   errors.heightOfTheConstruction
                 )} appearance-none`}
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
               />
-              <label
-                className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                           peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-              >
+              <label className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6">
                 Höhe (m) *
               </label>
               {errors.heightOfTheConstruction && (
@@ -560,14 +680,8 @@ function OfferForm({ onClose, variant = "general" }) {
                 className={`${fieldClass(
                   errors.widthOfTheConstruction
                 )} appearance-none`}
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
               />
-              <label
-                className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                           peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-              >
+              <label className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6">
                 Breite (m) *
               </label>
               {errors.widthOfTheConstruction && (
@@ -591,14 +705,8 @@ function OfferForm({ onClose, variant = "general" }) {
                 className={`${fieldClass(
                   errors.lengthOfTheConstruction
                 )} appearance-none`}
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
               />
-              <label
-                className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300
-                           peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6"
-              >
+              <label className="mt-3 absolute left-0 -top-6 text-sm text-gray-500 transition-all duration-300 peer-placeholder-shown:top-0 peer-placeholder-shown:text-base peer-focus:-top-6">
                 Länge (m) *
               </label>
               {errors.lengthOfTheConstruction && (
@@ -608,11 +716,7 @@ function OfferForm({ onClose, variant = "general" }) {
               )}
             </div>
           </div>
-        </>
-      )}
 
-      {isGeneral && (
-        <>
           <label className="mt-1 inline-flex items-center gap-3 select-none">
             <input
               type="checkbox"
@@ -620,9 +724,6 @@ function OfferForm({ onClose, variant = "general" }) {
               checked={!!form.carport}
               onChange={handleChange}
               className="h-4 w-4 rounded border-gray-300 accent-blue-400"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
             />
             <span className="text-sm text-gray-700">Carport / Garage</span>
           </label>
@@ -634,9 +735,6 @@ function OfferForm({ onClose, variant = "general" }) {
               checked={!!form.nearbyTrees}
               onChange={handleChange}
               className="h-4 w-4 rounded border-gray-300 accent-blue-400"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
             />
             <span className="text-sm text-gray-700">
               Bäume in der Nähe (mögliche Einschränkungen)
@@ -645,7 +743,7 @@ function OfferForm({ onClose, variant = "general" }) {
         </>
       )}
 
-      {/* Buttons for small screen wider */}
+      {/* Buttons */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-2 sm:pt-4">
         <button
           type="button"

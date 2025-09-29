@@ -18,6 +18,8 @@ function Footer() {
     ? { to: "to-[#a48894]", h3: "text-[#a48894]" }
     : pathname.startsWith("/reparatur")
     ? { to: "to-[#4d898a]", h3: "text-[#4d898a]" }
+    : pathname.startsWith("/wiederkehrende-pruefung")
+    ? { to: "to-[#9f7850]", h3: "text-[#9f7850]" }
     : { to: "to-blue-300", h3: "text-blue-700" };
 
   return (
@@ -140,6 +142,26 @@ function Footer() {
                 </span>
                 <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
                   Reparatur &amp; Ersatzteile
+                </span>
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                to="/wiederkehrende-pruefung"
+                className="group relative inline-block whitespace-nowrap"
+              >
+                <span
+                  aria-hidden
+                  className="invisible block font-medium leading-6"
+                >
+                  Wiederkehrende Prüfung
+                </span>
+                <span className="pointer-events-none absolute inset-0 block leading-6 text-black/70 transition-opacity group-hover:opacity-0">
+                  Wiederkehrende Prüfung
+                </span>
+                <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+                  Wiederkehrende Prüfung
                 </span>
               </Link>
             </li>

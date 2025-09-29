@@ -113,6 +113,7 @@ function Navbar() {
     { to: "/transport", label: "Krantransporte" },
     { to: "/de-montage", label: "Montage & Demontage" },
     { to: "/reparatur", label: "Reparatur & Ersatzteile" },
+    { to: "/wiederkehrende-pruefung", label: "Wiederkehrende Prüfung" },
   ];
 
   return (
@@ -251,7 +252,7 @@ function Navbar() {
                   <Link
                     to="/kontakt"
                     onClick={closeMenu}
-                    className="block text-lg font-medium hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 rounded"
+                    className="block text-2xl font-medium hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 rounded"
                   >
                     Kontakt
                   </Link>

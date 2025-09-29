@@ -5,7 +5,7 @@ import { useContent } from "../content/content";
 import Modal from "./ui/Modal";
 import OfferForm from "./OfferForm";
 
-import tuvImg from "../assets/images/tuv.png";
+import tuvImg from "../assets/images/pruefung.png";
 
 import playIcon from "../assets/icons/play.png";
 import stopIcon from "../assets/icons/stop-circle.png";

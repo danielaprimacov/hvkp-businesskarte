@@ -15,7 +15,12 @@ function Services() {
       ? lb.leistungen
       : defaultItems;
 
-  const ROUTES_BY_INDEX = ["/transport", "/de-montage", "/reparatur"];
+  const ROUTES_BY_INDEX = [
+    "/transport",
+    "/de-montage",
+    "/reparatur",
+    "/wiederkehrende-pruefung",
+  ];
 
   return (
     <div className="py-10 sm:py-12 md:py-15">
