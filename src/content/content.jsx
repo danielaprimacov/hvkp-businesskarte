@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
 import { fetchContentFromServer, saveContentToServer } from "../lib/cmsApi";
 
-const DEFAULTS_VERSION = 12;
+const DEFAULTS_VERSION = 13;
 
 const defaults = {
   __v: DEFAULTS_VERSION,

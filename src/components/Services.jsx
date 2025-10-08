@@ -10,10 +10,14 @@ function Services() {
   const defaultItems =
     contentDefaults.seiten.startseite.leistungsbereich.leistungen;
 
-  const items =
-    Array.isArray(lb.leistungen) && lb.leistungen.length > 0
-      ? lb.leistungen
-      : defaultItems;
+  const overrideItems = Array.isArray(lb.leistungen) ? lb.leistungen : [];
+
+  const items = defaultItems.map((def, i) => {
+    const ov = overrideItems[i];
+    return ov
+      ? { ...def, ...ov, bild: { ...def.bild, ...(ov.bild || {}) } }
+      : def;
+  });
 
   const ROUTES_BY_INDEX = [
     "/transport",
@@ -21,6 +25,8 @@ function Services() {
     "/reparatur",
     "/wiederkehrende-pruefung",
   ];
+
+  console.log(items);
 
   return (
     <div className="py-10 sm:py-12 md:py-15">
