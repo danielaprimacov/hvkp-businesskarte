@@ -42,7 +42,7 @@ function Modal({ children, isOpen, onClose }) {
       >
         <button
           onClick={onClose}
-          className="absolute cursor-pointer top-3 sm:top-4 right-3 sm:right-4 text-2xl hover:text-gray-500 focus:outline-none"
+          className="absolute cursor-pointer top-1 sm:top-4 right-4 sm:right-4 text-5xl hover:text-gray-500 focus:outline-none"
           aria-label="Close modal"
         >
           &times;

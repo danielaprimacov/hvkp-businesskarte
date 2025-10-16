@@ -64,7 +64,7 @@ const defaults = {
             },
           },
           {
-            titel: "Prüfung",
+            titel: "Wiederkehrende Prüfung",
             untertitel: "vorschriftsgemäß und dokumentiert",
             bild: {
               url: "/services/pruefung.png",
