@@ -3,14 +3,11 @@ import { useEffect } from "react";
 function Modal({ children, isOpen, onClose }) {
   // lock scroll when open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    // cleanup on unmount
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    document.body.classList.toggle("modal-open", isOpen);
     return () => {
       document.body.style.overflow = "";
+      document.body.classList.remove("modal-open");
     };
   }, [isOpen]);
 

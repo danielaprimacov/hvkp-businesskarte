@@ -8,3 +8,7 @@
     transform: translate3d(calc(-1 * var(--track-w)), 0, 0);
   }
 }
+
+body.modal-open .offer-widget {
+  display: none;
+}
