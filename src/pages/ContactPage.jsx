@@ -43,7 +43,7 @@ function ContactPage() {
 
         {/* Contacts + Map */}
         <div className="flex flex-col-reverse lg:flex-row justify-between items-start gap-8 lg:gap-12 px-4 sm:px-10 lg:px-40 mb-10">
-          <div className="w-full max-w-xl">
+          <div className="w-full max-w-xl flex flex-col">
             <p className="mb-2">Neuenkirchen</p>
 
             <a href="tel:+4915901212377" className="group inline-block">
@@ -63,7 +63,25 @@ function ContactPage() {
               </span>
             </a>
 
-            <p className="mt-1">E: michael@hovekamp.eu</p>
+            <a
+              href="mailto:michael@hovekamp.eu"
+              className="group inline-block mt-1"
+            >
+              <span className="relative inline-block whitespace-nowrap">
+                <span
+                  aria-hidden
+                  className="invisible block font-medium leading-6"
+                >
+                  E: michael@hovekamp.eu
+                </span>
+                <span className="pointer-events-none absolute inset-0 block leading-6 transition-opacity group-hover:opacity-0">
+                  E: michael@hovekamp.eu
+                </span>
+                <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
+                  E: michael@hovekamp.eu
+                </span>
+              </span>
+            </a>
 
             <MapLink address={ADDRESS} className="group inline-block mt-3">
               {/* Line 1 */}
