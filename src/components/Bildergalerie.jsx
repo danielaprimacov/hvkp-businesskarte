@@ -11,53 +11,137 @@ import { useContent } from "../content/content";
 function Bildergalerie() {
   const { content } = useContent();
   const title = content.seiten.startseite.bildergalerie.titel;
-  const logos = content.seiten.startseite.bildergalerie.bilder || [];
+  const bilder = content.seiten.startseite.bildergalerie.bilder || [];
 
-  const NORMAL = 80;
-  const [duration, setDuration] = useState(NORMAL);
+  // Refs
+  const scrollerRef = useRef(null); // horizontal scroll container
+  const groupRef = useRef(null); // first (measured) group
 
-  // Refs for measuring widths
-  const containerRef = useRef(null);
-  const groupRef = useRef(null);
+  // Width of one group & number of copies
+  const [groupW, setGroupW] = useState(0);
+  const [copies, setCopies] = useState(3);
 
-  // width of ONE strip (original group)
-  const [trackW, setTrackW] = useState(0);
+  // Auto-scroll speed (px/sec) and pause control
+  const speedRef = useRef(40);
+  const pauseUntilRef = useRef(0);
+  const rafRef = useRef(0);
+  const lastTsRef = useRef(0);
 
+  // Speed tuning + prefers-reduced-motion
   useEffect(() => {
     const apply = () => {
-      const isXS = window.innerWidth < 640;
-      setDuration(isXS ? 70 : NORMAL);
+      const base = window.innerWidth < 640 ? 32 : 40;
+      speedRef.current = base;
     };
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)");
-    if (reduced?.matches) setDuration(NORMAL * 1.5);
+    if (reduced?.matches) speedRef.current = 22;
     apply();
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
   }, []);
 
+  // Measure widths & decide how many copies we need for seamless loop
   const measure = useCallback(() => {
-    const group = groupRef.current;
-    if (!group) return;
-    const wGroup = group.getBoundingClientRect().width || 0;
-    setTrackW(wGroup);
+    const g = groupRef.current;
+    const sc = scrollerRef.current;
+    if (!g || !sc) return;
+
+    const wGroup = g.getBoundingClientRect().width || 0;
+    const wCont = sc.getBoundingClientRect().width || 0;
+
+    setGroupW(wGroup);
+    // Ensure enough content off-screen so looping is seamless while autoplaying or swiping
+    if (wGroup > 0) {
+      const need = Math.max(3, Math.ceil((wCont * 2) / wGroup) + 1);
+      setCopies(need);
+    }
   }, []);
 
   useLayoutEffect(() => {
-    const group = groupRef.current;
-    const cont = containerRef.current;
-    if (!group || !cont) return;
-
+    const g = groupRef.current;
+    const sc = scrollerRef.current;
+    if (!g || !sc) return;
     const ro = new ResizeObserver(measure);
-    ro.observe(group);
-    ro.observe(cont);
-
+    ro.observe(g);
+    ro.observe(sc);
     requestAnimationFrame(measure);
     return () => ro.disconnect();
-  }, [measure, logos]);
+  }, [measure, bilder]);
 
   const handleImgLoad = () => requestAnimationFrame(measure);
 
-  const ready = trackW > 0 && logos.length > 0;
+  // Autoplay marquee via scrollLeft (works on mobile + desktop; user can swipe to interrupt)
+  useEffect(() => {
+    const sc = scrollerRef.current;
+    if (!sc || !groupW || !bilder.length) return;
+
+    let running = true;
+    const tick = (ts) => {
+      if (!running) return;
+      if (!lastTsRef.current) lastTsRef.current = ts;
+      const dt = (ts - lastTsRef.current) / 1000; // seconds
+      lastTsRef.current = ts;
+
+      const now = performance.now();
+      const paused = now < pauseUntilRef.current;
+
+      if (!paused) {
+        sc.scrollLeft += speedRef.current * dt;
+        // seamless wrap
+        if (sc.scrollLeft >= groupW) sc.scrollLeft -= groupW;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(rafRef.current);
+      lastTsRef.current = 0;
+    };
+  }, [groupW, bilder.length]);
+
+  // Pause autoplay briefly on user interaction (touch/drag/wheel)
+  useEffect(() => {
+    const sc = scrollerRef.current;
+    if (!sc) return;
+
+    const pause = () => {
+      pauseUntilRef.current = performance.now() + 1800; // pause ~1.8s
+    };
+
+    const opts = { passive: true };
+    sc.addEventListener("touchstart", pause, opts);
+    sc.addEventListener("pointerdown", pause, opts);
+    sc.addEventListener("wheel", pause, opts);
+    sc.addEventListener("mousedown", pause, opts);
+    return () => {
+      sc.removeEventListener("touchstart", pause, opts);
+      sc.removeEventListener("pointerdown", pause, opts);
+      sc.removeEventListener("wheel", pause, opts);
+      sc.removeEventListener("mousedown", pause, opts);
+    };
+  }, []);
+
+  // Lightbox
+  const [lightboxIdx, setLightboxIdx] = useState(null);
+  const lightboxOpen = Number.isInteger(lightboxIdx);
+
+  // lock scroll + close on Esc
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => e.key === "Escape" && setLightboxIdx(null);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [lightboxOpen]);
+
+  const groups = Array.from({ bilder: copies }, () => bilder);
+  const ready = groupW > 0 && bilder.length > 0;
 
   return (
     <section className="pb-15 relative overflow-hidden">
@@ -65,61 +149,92 @@ function Bildergalerie() {
         {title}
       </h1>
 
-      <div ref={containerRef} className="overflow-hidden px-4 sm:px-0">
+      {/* Horizontal marquee that can be swiped (touch-drag) */}
+      <div className="px-4 sm:px-0">
         <div
-          key={`${trackW}-${duration}-${logos.length}`}
-          className="inline-flex items-center min-w-max will-change-transform gap-6 sm:gap-10"
+          ref={scrollerRef}
+          className="overflow-x-auto w-full"
           style={{
-            // travel exactly one strip width, then the clone takes over seamlessly
-            ["--track-w"]: `${trackW}px`,
-            animation: ready
-              ? `marquee-x ${duration}s linear infinite`
-              : "none",
+            scrollBehavior: "smooth",
+            WebkitOverflowScrolling: "touch",
+            // (Optional) hide scrollbars if you have a utility; otherwise leave visible
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
-          {/* ORIGINAL STRIP (measured for width) */}
-          <div
-            ref={groupRef}
-            className="inline-flex items-center gap-6 sm:gap-10"
-          >
-            {logos.map((it, i) => (
-              <div key={`orig-${i}`} className="flex-shrink-0">
-                <img
-                  src={it.url}
-                  alt={it.alt || "Bild"}
-                  className="h-40 sm:h-54 md:h-68 w-auto object-contain select-none pointer-events-none rounded"
-                  draggable="false"
-                  loading="eager"
-                  decoding="async"
-                  onLoad={handleImgLoad}
-                  onError={(e) => (e.currentTarget.style.opacity = "0.3")}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* ONE CLONE for seamless wrap */}
-          <div
-            className="inline-flex items-center gap-6 sm:gap-10"
-            aria-hidden="true"
-          >
-            {logos.map((it, i) => (
-              <div key={`clone-${i}`} className="flex-shrink-0">
-                <img
-                  src={it.url}
-                  alt=""
-                  className="h-40 sm:h-54 md:h-68 w-auto object-contain select-none pointer-events-none rounded"
-                  draggable="false"
-                  loading="lazy"
-                  decoding="async"
-                  onLoad={handleImgLoad}
-                  onError={(e) => (e.currentTarget.style.opacity = "0.3")}
-                />
-              </div>
-            ))}
+          <div className="inline-flex items-center gap-6 sm:gap-10">
+            {/* First group (measured) */}
+            <div
+              ref={groupRef}
+              className="inline-flex items-center gap-6 sm:gap-10"
+            >
+              {bilder.map((it, i) => (
+                <div key={`g0-${i}`} className="flex-shrink-0">
+                  <img
+                    src={it.url}
+                    alt={it.alt || "Bild"}
+                    className="h-40 sm:h-54 md:h-68 w-auto object-contain select-none pointer-events-auto cursor-pointer rounded"
+                    draggable="false"
+                    loading="eager"
+                    decoding="async"
+                    onLoad={handleImgLoad}
+                    onClick={() => setLightboxIdx(i)}
+                    onError={(e) => (e.currentTarget.style.opacity = "0.3")}
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Clones for seamless loop */}
+            {ready &&
+              groups.slice(1).map((group, gi) => (
+                <div
+                  key={`clone-${gi}`}
+                  className="inline-flex items-center gap-6 sm:gap-10"
+                  aria-hidden="true"
+                >
+                  {group.map((it, i) => (
+                    <div key={`g${gi + 1}-${i}`} className="flex-shrink-0">
+                      <img
+                        src={it.url}
+                        alt=""
+                        className="h-40 sm:h-54 md:h-68 w-auto object-contain select-none pointer-events-auto cursor-pointer rounded"
+                        draggable="false"
+                        loading="lazy"
+                        decoding="async"
+                        onClick={() => setLightboxIdx(i)}
+                        onError={(e) => (e.currentTarget.style.opacity = "0.3")}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ))}
           </div>
         </div>
       </div>
+
+      {/* Lightbox (click outside or Esc to close) */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-[1200] bg-black/80 backdrop-blur-sm grid place-items-center p-4"
+          onClick={() => setLightboxIdx(null)}
+        >
+          <div className="relative max-w-[95vw] max-h-[90vh]">
+            <img
+              src={bilder[lightboxIdx]?.url}
+              alt={bilder[lightboxIdx]?.alt || `Bild ${lightboxIdx + 1}`}
+              className="max-w-[95vw] max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              aria-label="Schließen"
+              className="absolute top-2 right-2 h-10 w-10 rounded-full bg-black/60 text-white grid place-items-center cursor-pointer"
+              onClick={() => setLightboxIdx(null)}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

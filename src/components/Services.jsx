@@ -26,8 +26,6 @@ function Services() {
     "/wiederkehrende-pruefung",
   ];
 
-  console.log(items);
-
   return (
     <div className="py-10 sm:py-12 md:py-15">
       <h1 className="mb-8 sm:mb-10 md:mb-15 text-2xl sm:text-3xl md:text-4xl uppercase font-medium text-center tracking-widest">
