@@ -32,8 +32,8 @@ function Bildergalerie() {
     const m = window.matchMedia?.("(prefers-reduced-motion: reduce)");
     const apply = () => {
       const vw = Math.max(window.innerWidth, 320);
-      const base = vw * (m?.matches ? 0.08 : 0.16);
-      speedRef.current = Math.max(80, base); // min 80 px/sec
+      const base = vw * (m?.matches ? 0.04 : 0.08);
+      speedRef.current = Math.max(50, base); // min 50 px/sec
     };
     apply();
     window.addEventListener("resize", apply);
