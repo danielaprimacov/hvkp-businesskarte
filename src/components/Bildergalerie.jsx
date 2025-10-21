@@ -27,20 +27,20 @@ function Bildergalerie() {
   const rafRef = useRef(0);
   const lastTsRef = useRef(0);
 
-  // Speed tuning + prefers-reduced-motion
+  // Speed tuned for phones (16% of vw/sec) with a floor
   useEffect(() => {
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    const m = window.matchMedia?.("(prefers-reduced-motion: reduce)");
     const apply = () => {
-      const vw = Math.max(window.innerWidth, 320); // CSS px
-      const perVwPerSec = reduced?.matches ? 0.04 : 0.08; // 4–8% of viewport width per second
-      speedRef.current = vw * perVwPerSec; // px/sec
+      const vw = Math.max(window.innerWidth, 320);
+      const base = vw * (m?.matches ? 0.08 : 0.16);
+      speedRef.current = Math.max(80, base); // min 80 px/sec
     };
     apply();
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
   }, []);
 
-  // Measure widths & decide how many copies we need for seamless loop
+  // Measure first strip and decide copies
   const measure = useCallback(() => {
     const g = groupRef.current;
     const sc = scrollerRef.current;
@@ -48,12 +48,12 @@ function Bildergalerie() {
 
     const wGroup = g.getBoundingClientRect().width || 0;
     const wCont = sc.getBoundingClientRect().width || 0;
-
     setGroupW(wGroup);
-    // Ensure enough content off-screen so looping is seamless while autoplaying or swiping
+
     if (wGroup > 0) {
-      const need = Math.max(3, Math.ceil((wCont * 2) / wGroup) + 1);
-      setCopies(need);
+      // 1 leading + original + trailing clones so there’s always content
+      const total = Math.max(3, Math.ceil((wCont * 2) / wGroup) + 1);
+      setCopies(total);
     }
   }, []);
 
@@ -70,56 +70,67 @@ function Bildergalerie() {
 
   const handleImgLoad = () => requestAnimationFrame(measure);
 
-  // Autoplay marquee via scrollLeft (works on mobile + desktop; user can swipe to interrupt)
+  // Start in the middle strip (after leading clone)
+  useEffect(() => {
+    const sc = scrollerRef.current;
+    if (!sc || !groupW) return;
+    sc.scrollLeft = groupW;
+  }, [groupW]);
+
+  // Keep user in the middle segment for infinite swipe both ways
+  const wrapScroll = useCallback(() => {
+    const sc = scrollerRef.current;
+    if (!sc || !groupW) return;
+    if (sc.scrollLeft < 1) sc.scrollLeft += groupW; // jumped before start
+    else if (sc.scrollLeft >= 2 * groupW - 1) sc.scrollLeft -= groupW; // past end
+  }, [groupW]);
+
+  // Autoplay via scrollLeft (with sub-pixel carry), then wrap
   useEffect(() => {
     const sc = scrollerRef.current;
     if (!sc || !groupW || !bilder.length) return;
 
     let running = true;
+    sc._carry = sc._carry || 0;
+
     const tick = (ts) => {
       if (!running) return;
       if (!lastTsRef.current) lastTsRef.current = ts;
-      const dt = (ts - lastTsRef.current) / 1000; // seconds
+      const dt = (ts - lastTsRef.current) / 1000;
       lastTsRef.current = ts;
 
       const now = performance.now();
       const paused = now < pauseUntilRef.current;
 
       if (!paused) {
-        const prevCarry = sc._carry || 0;
-        const dist = speedRef.current * dt + prevCarry; // px
-        const step = dist | 0; // integer px to apply
-        sc._carry = dist - step; // keep the remainder for next frame
+        const dist = speedRef.current * dt + (sc._carry || 0);
+        const step = dist | 0; // integer pixels
+        sc._carry = dist - step; // keep fractional remainder
         sc.scrollLeft += step;
-        // seamless wrap
-        if (sc.scrollLeft >= groupW) sc.scrollLeft = sc.scrollLeft % groupW;
+        wrapScroll();
       }
       rafRef.current = requestAnimationFrame(tick);
     };
-    rafRef.current = requestAnimationFrame(tick);
 
+    rafRef.current = requestAnimationFrame(tick);
     return () => {
       running = false;
       cancelAnimationFrame(rafRef.current);
       lastTsRef.current = 0;
     };
-  }, [groupW, bilder.length]);
+  }, [groupW, bilder.length, wrapScroll]);
 
-  // Pause autoplay briefly on user interaction (touch/drag/wheel)
+  // Pause on hover (desktop); resume on leave
   useEffect(() => {
     const sc = scrollerRef.current;
     if (!sc) return;
-
     const onEnter = () => {
-      // pause while hovered
       pauseUntilRef.current = Number.POSITIVE_INFINITY;
     };
     const onLeave = () => {
-      // resume immediately and restart dt integration
       pauseUntilRef.current = performance.now() - 1;
       lastTsRef.current = 0;
     };
-
     sc.addEventListener("mouseenter", onEnter);
     sc.addEventListener("mouseleave", onLeave);
     return () => {
@@ -128,11 +139,20 @@ function Bildergalerie() {
     };
   }, []);
 
+  // When user swipes/wheels, keep wrap and pause autoplay briefly
+  useEffect(() => {
+    const sc = scrollerRef.current;
+    if (!sc) return;
+    const onScroll = () => {
+      wrapScroll();
+    };
+    sc.addEventListener("scroll", onScroll, { passive: true });
+    return () => sc.removeEventListener("scroll", onScroll);
+  }, [wrapScroll]);
+
   // Lightbox
   const [lightboxIdx, setLightboxIdx] = useState(null);
   const lightboxOpen = Number.isInteger(lightboxIdx);
-
-  // lock scroll + close on Esc
   useEffect(() => {
     if (!lightboxOpen) return;
     const prev = document.body.style.overflow;
@@ -145,7 +165,10 @@ function Bildergalerie() {
     };
   }, [lightboxOpen]);
 
-  const groups = Array.from({ length: Math.max(1, copies - 1) }, () => bilder);
+  // Build: 1 leading clone + original + trailing clones
+  const total = Math.max(3, copies);
+  const leadingGroups = Array.from({ length: 1 }, () => bilder);
+  const trailingGroups = Array.from({ length: total - 2 }, () => bilder);
   const ready = groupW > 0 && bilder.length > 0;
 
   return (
@@ -154,30 +177,54 @@ function Bildergalerie() {
         {title}
       </h1>
 
-      {/* Horizontal marquee that can be swiped (touch-drag) */}
       <div className="px-4 sm:px-0">
         <div
           ref={scrollerRef}
-          className="overflow-x-auto overflow-y-hidden w-full"
+          className="overflow-x-auto w-full"
           style={{
             WebkitOverflowScrolling: "touch",
-            // hide scrollbars
             scrollbarWidth: "none",
             msOverflowStyle: "none",
           }}
         >
-          <div className="inline-flex items-center min-w-max gap-6 sm:gap-10">
-            {/* First group (measured) */}
+          {/* IMPORTANT: no wrapping + track wider than its contents */}
+          <div className="flex flex-nowrap items-center min-w-max gap-6 sm:gap-10">
+            {/* Leading clone(s) */}
+            {ready &&
+              leadingGroups.map((group, gi) => (
+                <div
+                  key={`lead-${gi}`}
+                  className="flex flex-nowrap items-center gap-6 sm:gap-10"
+                  aria-hidden="true"
+                >
+                  {group.map((it, i) => (
+                    <div key={`L${gi}-${i}`} className="flex-shrink-0">
+                      <img
+                        src={it.url}
+                        alt=""
+                        className="h-40 sm:h-56 md:h-72 w-auto object-contain select-none cursor-pointer rounded"
+                        draggable="false"
+                        loading="lazy"
+                        decoding="async"
+                        onClick={() => setLightboxIdx(i)}
+                        onError={(e) => (e.currentTarget.style.opacity = "0.3")}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+            {/* Original strip (measured) */}
             <div
               ref={groupRef}
-              className="flex-none inline-flex items-center gap-6 sm:gap-10"
+              className="flex flex-nowrap items-center gap-6 sm:gap-10"
             >
               {bilder.map((it, i) => (
-                <div key={`g0-${i}`} className="flex-shrink-0">
+                <div key={`orig-${i}`} className="flex-shrink-0">
                   <img
                     src={it.url}
                     alt={it.alt || "Bild"}
-                    className="h-40 sm:h-54 md:h-68 w-auto object-contain select-none pointer-events-auto cursor-pointer rounded"
+                    className="h-40 sm:h-56 md:h-72 w-auto object-contain select-none cursor-pointer rounded"
                     draggable="false"
                     loading="eager"
                     decoding="async"
@@ -188,20 +235,21 @@ function Bildergalerie() {
                 </div>
               ))}
             </div>
-            {/* Clones for seamless loop */}
+
+            {/* Trailing clone(s) */}
             {ready &&
-              groups.map((group, gi) => (
+              trailingGroups.map((group, gi) => (
                 <div
-                  key={`clone-${gi}`}
-                  className="flex-none inline-flex items-center gap-6 sm:gap-10"
+                  key={`trail-${gi}`}
+                  className="flex flex-nowrap items-center gap-6 sm:gap-10"
                   aria-hidden="true"
                 >
                   {group.map((it, i) => (
-                    <div key={`g${gi + 1}-${i}`} className="flex-shrink-0">
+                    <div key={`T${gi}-${i}`} className="flex-shrink-0">
                       <img
                         src={it.url}
                         alt=""
-                        className="h-40 sm:h-54 md:h-68 w-auto object-contain select-none pointer-events-auto cursor-pointer rounded"
+                        className="h-40 sm:h-56 md:h-72 w-auto object-contain select-none cursor-pointer rounded"
                         draggable="false"
                         loading="lazy"
                         decoding="async"
@@ -216,7 +264,7 @@ function Bildergalerie() {
         </div>
       </div>
 
-      {/* Lightbox (click outside or Esc to close) */}
+      {/* Lightbox */}
       {lightboxOpen && (
         <div
           className="fixed inset-0 z-[1200] bg-black/80 backdrop-blur-sm grid place-items-center p-4"
