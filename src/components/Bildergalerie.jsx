@@ -88,7 +88,7 @@ function Bildergalerie() {
       if (!paused) {
         sc.scrollLeft += speedRef.current * dt;
         // seamless wrap
-        if (sc.scrollLeft >= groupW) sc.scrollLeft -= groupW;
+        if (sc.scrollLeft >= groupW) sc.scrollLeft = sc.scrollLeft % groupW;
       }
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -106,20 +106,21 @@ function Bildergalerie() {
     const sc = scrollerRef.current;
     if (!sc) return;
 
-    const pause = () => {
-      pauseUntilRef.current = performance.now() + 1800; // pause ~1.8s
+    const onEnter = () => {
+      // pause while hovered
+      pauseUntilRef.current = Number.POSITIVE_INFINITY;
+    };
+    const onLeave = () => {
+      // resume immediately and restart dt integration
+      pauseUntilRef.current = performance.now() - 1;
+      lastTsRef.current = 0;
     };
 
-    const opts = { passive: true };
-    sc.addEventListener("touchstart", pause, opts);
-    sc.addEventListener("pointerdown", pause, opts);
-    sc.addEventListener("wheel", pause, opts);
-    sc.addEventListener("mousedown", pause, opts);
+    sc.addEventListener("mouseenter", onEnter);
+    sc.addEventListener("mouseleave", onLeave);
     return () => {
-      sc.removeEventListener("touchstart", pause, opts);
-      sc.removeEventListener("pointerdown", pause, opts);
-      sc.removeEventListener("wheel", pause, opts);
-      sc.removeEventListener("mousedown", pause, opts);
+      sc.removeEventListener("mouseenter", onEnter);
+      sc.removeEventListener("mouseleave", onLeave);
     };
   }, []);
 
@@ -140,7 +141,7 @@ function Bildergalerie() {
     };
   }, [lightboxOpen]);
 
-  const groups = Array.from({ bilder: copies }, () => bilder);
+  const groups = Array.from({ length: Math.max(1, copies - 1) }, () => bilder);
   const ready = groupW > 0 && bilder.length > 0;
 
   return (
@@ -153,20 +154,19 @@ function Bildergalerie() {
       <div className="px-4 sm:px-0">
         <div
           ref={scrollerRef}
-          className="overflow-x-auto w-full"
+          className="overflow-x-auto overflow-y-hidden w-full"
           style={{
-            scrollBehavior: "smooth",
             WebkitOverflowScrolling: "touch",
-            // (Optional) hide scrollbars if you have a utility; otherwise leave visible
+            // hide scrollbars
             scrollbarWidth: "none",
             msOverflowStyle: "none",
           }}
         >
-          <div className="inline-flex items-center gap-6 sm:gap-10">
+          <div className="inline-flex items-center min-w-max gap-6 sm:gap-10">
             {/* First group (measured) */}
             <div
               ref={groupRef}
-              className="inline-flex items-center gap-6 sm:gap-10"
+              className="flex-none inline-flex items-center gap-6 sm:gap-10"
             >
               {bilder.map((it, i) => (
                 <div key={`g0-${i}`} className="flex-shrink-0">
@@ -186,10 +186,10 @@ function Bildergalerie() {
             </div>
             {/* Clones for seamless loop */}
             {ready &&
-              groups.slice(1).map((group, gi) => (
+              groups.map((group, gi) => (
                 <div
                   key={`clone-${gi}`}
-                  className="inline-flex items-center gap-6 sm:gap-10"
+                  className="flex-none inline-flex items-center gap-6 sm:gap-10"
                   aria-hidden="true"
                 >
                   {group.map((it, i) => (
