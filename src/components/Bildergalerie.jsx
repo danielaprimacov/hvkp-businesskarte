@@ -29,12 +29,12 @@ function Bildergalerie() {
 
   // Speed tuning + prefers-reduced-motion
   useEffect(() => {
-    const apply = () => {
-      const base = window.innerWidth < 640 ? 32 : 40;
-      speedRef.current = base;
-    };
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)");
-    if (reduced?.matches) speedRef.current = 22;
+    const apply = () => {
+      const vw = Math.max(window.innerWidth, 320); // CSS px
+      const perVwPerSec = reduced?.matches ? 0.04 : 0.08; // 4–8% of viewport width per second
+      speedRef.current = vw * perVwPerSec; // px/sec
+    };
     apply();
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
@@ -86,7 +86,11 @@ function Bildergalerie() {
       const paused = now < pauseUntilRef.current;
 
       if (!paused) {
-        sc.scrollLeft += speedRef.current * dt;
+        const prevCarry = sc._carry || 0;
+        const dist = speedRef.current * dt + prevCarry; // px
+        const step = dist | 0; // integer px to apply
+        sc._carry = dist - step; // keep the remainder for next frame
+        sc.scrollLeft += step;
         // seamless wrap
         if (sc.scrollLeft >= groupW) sc.scrollLeft = sc.scrollLeft % groupW;
       }
