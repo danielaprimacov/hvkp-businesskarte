@@ -15,52 +15,29 @@ function Navbar() {
   const [closing, setClosing] = useState(false); // keep ✕ until exit completes
 
   const prefersReduced = useReducedMotion();
+  const { pathname } = useLocation();
+  const isHome = pathname === "/";
 
-  const location = useLocation();
-  const isHome = location.pathname === "/";
+  const lastY = useRef(0);
+  const ticking = useRef(false);
+  const overHeroRef = useRef(false);
+  const [overHero, _setOverHero] = useState(false); // state for rendering
 
-  const lastScrollY = useRef(0);
+  const setOverHero = (v) => {
+    overHeroRef.current = v;
+    _setOverHero(v);
+  };
 
   const { authed } = useAuth();
   const adminPath = authed ? "/admin" : "/admin/login";
 
+  // close drawer on route change + ensure nav visible initially
   useEffect(() => {
-    if (menuOpen) closeMenu(); // guard inside closeMenu prevents the bug
-  }, [location.pathname]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      const heroBottom = window.innerHeight; // height of the hero on home
-      const DELTA = 6; // ignore tiny scroll jitter (iOS bounce)
-      const TOP_LOCK = 8; // always show when very top is reached
-
-      // on home: always show while over hero
-      if (isHome && currentY <= heroBottom) {
-        setShowNav(true);
-      } else {
-        // Elsewhere (or below hero on home): hide on scroll down, show on scroll up
-        if (currentY <= TOP_LOCK) {
-          // At the very top: always show (prevents disappearing on iOS overscroll)
-          setShowNav(true);
-        } else if (currentY - lastScrollY.current > DELTA) {
-          // Scrolling down noticeably
-          setShowNav(false);
-        } else if (lastScrollY.current - currentY > DELTA) {
-          // Scrolling up noticeably
-          setShowNav(true);
-        }
-      }
-
-      lastScrollY.current = currentY;
-    };
-
-    // Set initial state correctly on mount
-    handleScroll();
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isHome]);
+    if (menuOpen) closeMenu();
+    setShowNav(true);
+    // reset lastY baseline so direction logic starts clean
+    lastY.current = Math.max(0, window.scrollY || window.pageYOffset || 0);
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // lock body scroll when drawer open
   useEffect(() => {
@@ -72,17 +49,87 @@ function Navbar() {
     setClosing(false);
     setMenuOpen(true);
   };
-
   const closeMenu = () => {
-    if (!menuOpen) return; // do nothing if already closed
-    setClosing(true); // tell icon to stay as ✕ until exit finishes
+    if (!menuOpen) return;
+    setClosing(true);
     setMenuOpen(false);
   };
-
-  // Keep the close icon visible while exiting
   const iconShowsClose = menuOpen || closing;
 
-  // framer variants
+  // Compute “over the hero?” robustly each frame
+  const computeOverHero = () => {
+    // prefer an explicit hero element
+    const heroEl = document.getElementById("home-hero");
+    if (heroEl) {
+      const bottom = heroEl.getBoundingClientRect().bottom;
+      return bottom > 1; // still overlapping the viewport
+    }
+    // else try a sentinel placed right AFTER the hero
+    const sentinel = document.getElementById("hero-after");
+    if (sentinel) {
+      const top = sentinel.getBoundingClientRect().top;
+      return top > 1; // sentinel still below the top edge => we’re over the hero
+    }
+    // fallback: assume hero is ~1 viewport tall
+    const y = Math.max(0, window.scrollY || window.pageYOffset || 0);
+    return y < window.innerHeight - 1;
+  };
+
+  // Hide-on-down / show-on-up, but pin visible while over hero (home only)
+  useEffect(() => {
+    const DELTA = 6;     // ignore tiny jitter
+    const TOP_LOCK = 8;  // always show near top to avoid iOS bounce flicker
+
+    const onScroll = () => {
+      if (ticking.current) return;
+      ticking.current = true;
+
+      requestAnimationFrame(() => {
+        ticking.current = false;
+
+        if (menuOpen) return; // keep visible while drawer open
+
+        const y = Math.max(0, window.scrollY || window.pageYOffset || 0);
+        const overHero = isHome && computeOverHero();
+
+        if (overHero) {
+          // While over the hero on home, nav stays visible
+          setShowNav(true);
+          lastY.current = y;
+          return;
+        }
+
+        // Below hero (or not on home): hide on down, show on up
+        if (y <= TOP_LOCK) {
+          setShowNav(true);
+        } else if (y - lastY.current > DELTA) {
+          // scrolling down
+          setShowNav(false);
+        } else if (lastY.current - y > DELTA) {
+          // scrolling up
+          setShowNav(true);
+        }
+
+        lastY.current = y;
+      });
+    };
+
+    // initialize baseline + run once
+    lastY.current = Math.max(0, window.scrollY || window.pageYOffset || 0);
+    onScroll();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("touchmove", onScroll, { passive: true }); // helps iOS
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("touchmove", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [isHome, menuOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Anim params
   const EASING = prefersReduced ? "linear" : [0.22, 1, 0.36, 1];
   const durIn = prefersReduced ? 0 : 0.25;
   const durOut = prefersReduced ? 0 : 0.22;
@@ -108,7 +155,6 @@ function Navbar() {
   };
 
   const links = [{ to: "/", label: "Startseite" }];
-
   const serviceLinks = [
     { to: "/transport", label: "Krantransporte" },
     { to: "/de-montage", label: "Montage & Demontage" },
@@ -124,63 +170,55 @@ function Navbar() {
         } transition-all duration-500 ease-out overflow-visible`}
       >
         <div className="w-full h-full flex items-center justify-between">
-          <div>
-            <button
-              onClick={() => (menuOpen ? closeMenu() : openMenu())}
-              aria-label={iconShowsClose ? "Menü schließen" : "Menü öffnen"}
-              className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 cursor-pointer"
-            >
-              <AnimatePresence initial={false} mode="wait">
-                {iconShowsClose ? (
-                  <motion.img
-                    key="close"
-                    src={crossIcon}
-                    alt="Menü schließen"
-                    initial={{ opacity: 0, rotate: -90, scale: 0.9 }}
-                    animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                    exit={{ opacity: 0, rotate: 90, scale: 0.9 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                    className="w-full h-full"
-                  />
-                ) : (
-                  <motion.img
-                    key="open"
-                    src={menuIcon}
-                    alt="Menü öffnen"
-                    initial={{ opacity: 0, rotate: 90, scale: 0.9 }}
-                    animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                    exit={{ opacity: 0, rotate: -90, scale: 0.9 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                    className="w-full h-full"
-                  />
-                )}
-              </AnimatePresence>
-            </button>
-          </div>
+          {/* Menu button */}
+          <button
+            onClick={() => (menuOpen ? closeMenu() : openMenu())}
+            aria-label={iconShowsClose ? "Menü schließen" : "Menü öffnen"}
+            className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 cursor-pointer"
+          >
+            <AnimatePresence initial={false} mode="wait">
+              {iconShowsClose ? (
+                <motion.img
+                  key="close"
+                  src={crossIcon}
+                  alt="Menü schließen"
+                  initial={{ opacity: 0, rotate: -90, scale: 0.9 }}
+                  animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                  exit={{ opacity: 0, rotate: 90, scale: 0.9 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  className="w-full h-full"
+                />
+              ) : (
+                <motion.img
+                  key="open"
+                  src={menuIcon}
+                  alt="Menü öffnen"
+                  initial={{ opacity: 0, rotate: 90, scale: 0.9 }}
+                  animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                  exit={{ opacity: 0, rotate: -90, scale: 0.9 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  className="w-full h-full"
+                />
+              )}
+            </AnimatePresence>
+          </button>
 
+          {/* Logo */}
           <Link to="/" onClick={menuOpen ? closeMenu : undefined}>
-            <img
-              className="w-24 sm:w-24 cursor-pointer"
-              src={logo}
-              alt="Logo"
-            />
+            <img className="w-24 sm:w-24 cursor-pointer" src={logo} alt="Logo" />
           </Link>
 
+          {/* Admin/Profile */}
           <Link to={adminPath} onClick={menuOpen ? closeMenu : undefined}>
-            <img
-              className="w-6 sm:w-7 cursor-pointer"
-              src={AdminIcon}
-              alt="Profile Icon"
-            />
+            <img className="w-6 sm:w-7 cursor-pointer" src={AdminIcon} alt="Profil" />
           </Link>
         </div>
       </nav>
 
-      {/* Drawer + Backdrop with exit callback to clear "closing" */}
+      {/* Drawer + Backdrop */}
       <AnimatePresence onExitComplete={() => setClosing(false)}>
         {menuOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               key="backdrop"
               className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[2000]"
@@ -191,8 +229,6 @@ function Navbar() {
               transition={{ duration: durIn }}
               aria-hidden="true"
             />
-
-            {/* Drawer */}
             <motion.aside
               key="drawer"
               className="fixed top-0 left-0 h-full w-[18rem] bg-white shadow-lg z-[2010] p-6 overflow-auto"
@@ -201,7 +237,6 @@ function Navbar() {
               animate="visible"
               exit="exit"
             >
-              {/* inner close */}
               <button
                 onClick={closeMenu}
                 className="absolute top-4 right-4 p-1 cursor-pointer"
@@ -210,7 +245,6 @@ function Navbar() {
                 <img src={crossIcon} alt="Menü schließen" className="w-5 h-5" />
               </button>
 
-              {/* Links with staggered reveal */}
               <motion.nav
                 className="mt-8 space-y-2"
                 initial="hidden"
