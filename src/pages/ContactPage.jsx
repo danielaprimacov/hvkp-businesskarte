@@ -1,5 +1,4 @@
 import contactBackground from "../assets/images/contact-background.jpg";
-import MapLink from "../components/ui/MapLink";
 
 import { OsmMap } from "../components/ui/OsmMap";
 
@@ -42,10 +41,9 @@ function ContactPage() {
         </div>
 
         {/* Contacts + Map */}
-        <div className="flex flex-col-reverse lg:flex-row justify-between items-start gap-8 lg:gap-12 px-4 sm:px-10 lg:px-40 mb-10">
-          <div className="w-full max-w-xl flex flex-col">
-            <p className="mb-2">Neuenkirchen</p>
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-8 lg:gap-6 px-6 sm:px-10 lg:px-40 mb-10">
+          {/* Left column: phone + email (+ opening hours on desktop) */}
+          <div className="w-full max-w-xl flex flex-col space-y-1">
             <a href="tel:+4915901212377" className="group inline-block">
               <span className="relative inline-block whitespace-nowrap">
                 <span
@@ -63,10 +61,7 @@ function ContactPage() {
               </span>
             </a>
 
-            <a
-              href="mailto:michael@hovekamp.eu"
-              className="group inline-block mt-1"
-            >
+            <a href="mailto:michael@hovekamp.eu" className="group inline-block">
               <span className="relative inline-block whitespace-nowrap">
                 <span
                   aria-hidden
@@ -83,47 +78,23 @@ function ContactPage() {
               </span>
             </a>
 
-            <MapLink address={ADDRESS} className="group inline-block mt-3">
-              {/* Line 1 */}
-              <span className="relative block whitespace-nowrap">
-                <span
-                  aria-hidden
-                  className="invisible block font-medium leading-6"
-                >
-                  Hovekampsweg 15
-                </span>
-                <span className="pointer-events-none absolute inset-0 block leading-6 transition-opacity group-hover:opacity-0">
-                  Hovekampsweg 15
-                </span>
-                <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
-                  Hovekampsweg 15
-                </span>
-              </span>
-
-              {/* Line 2 */}
-              <span className="relative block whitespace-nowrap mb-2">
-                <span
-                  aria-hidden
-                  className="invisible block font-medium leading-6"
-                >
-                  48485 Neuenkirchen, Germany
-                </span>
-                <span className="pointer-events-none absolute inset-0 block leading-6 transition-opacity group-hover:opacity-0">
-                  48485 Neuenkirchen, Germany
-                </span>
-                <span className="pointer-events-none absolute inset-0 block leading-6 font-medium text-black opacity-0 transition-opacity group-hover:opacity-100">
-                  48485 Neuenkirchen, Germany
-                </span>
-              </span>
-            </MapLink>
-
-            <div className="mt-2">
+            {/* Öffnungszeiten directly under email on desktop */}
+            <div className="hidden lg:block mt-2">
               <p>Unsere Öffnungszeiten sind:</p>
               <p>Mo - So. Nur nach Vereinbarung</p>
             </div>
           </div>
 
-          <OsmMap lat={52.24641172535073} lng={7.365852760569325} />
+          {/* Map (right on desktop) */}
+          <div className="w-full lg:pl-4">
+            <OsmMap lat={52.24641172535073} lng={7.365852760569325} />
+          </div>
+
+          {/* Öffnungszeiten below the map on mobile only */}
+          <div className="lg:hidden mt-2">
+            <p>Unsere Öffnungszeiten sind:</p>
+            <p>Mo - So. Nur nach Vereinbarung</p>
+          </div>
         </div>
       </section>
     </div>
