@@ -53,50 +53,6 @@ function TextField({ label, value, onChange }) {
   );
 }
 
-// String array editor (e.g., subtitles)
-function StringArrayField({ label, value, onChange }) {
-  const updateIdx = (i, v) => {
-    const next = [...value];
-    next[i] = v;
-    onChange(next);
-  };
-  const addItem = () => onChange([...(value || []), ""]);
-  const removeIdx = (i) => onChange(value.filter((_, idx) => idx !== i));
-
-  return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-2">
-        <label className="block text-sm font-medium">{label}</label>
-        <button
-          type="button"
-          onClick={addItem}
-          className="text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500 cursor-pointer"
-        >
-          + Hinzufügen
-        </button>
-      </div>
-      <div className="space-y-2">
-        {value.map((v, i) => (
-          <div key={i} className="flex flex-col sm:flex-row gap-2">
-            <input
-              className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={v}
-              onChange={(e) => updateIdx(i, e.target.value)}
-            />
-            <button
-              type="button"
-              onClick={() => removeIdx(i)}
-              className="px-3 py-2 rounded border hover:bg-gray-50 cursor-pointer"
-            >
-              Entfernen
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // Object array editor (e.g., logos with {url, alt})
 function ObjectArrayField({ label, value, onChange }) {
   const [busyIdx, setBusyIdx] = useState(null);
@@ -516,11 +472,23 @@ export default function AdminPage() {
   const [active, setActive] = useState(pageKeys[0] || "startseite");
   const ActivePageNode = pages[active];
 
+  const [pagesOpen, setPagesOpen] = useState(false);
+
+  const handleSelectPage = (k) => {
+    setActive(k);
+    setPagesOpen(false); // auto-close the list
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
       <div className="fixed top-0 left-0 right-0 z-20 backdrop-blur bg-white/80 shadow-sm pb-2">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3">
-          <h1 className="text-lg sm:text-xl font-semibold mb-3">
+          <h1
+            className="text-lg sm:text-xl font-semibold mb-3 cursor-pointer select-none"
+            onClick={() => setPagesOpen((s) => !s)}
+            aria-expanded={pagesOpen}
+            aria-controls="pages-panel"
+          >
             Admin Inhalte
             <span className="ml-2 text-xs align-middle text-blue-700">
               {saving
@@ -537,60 +505,62 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Mobile: tabs + actions */}
-          <div className="sm:hidden mb-3 space-y-3">
-            {/* Tabs (stacked) */}
-            <div className="flex flex-col gap-2">
-              {pageKeys.map((k) => (
-                <button
-                  key={k}
-                  onClick={() => setActive(k)}
-                  className={
-                    "px-3 py-2 rounded-full text-sm border-transparent transition text-left cursor-pointer " +
-                    (active === k
-                      ? "bg-blue-600 text-white border-blue-600 shadow"
-                      : "bg-white hover:bg-blue-50")
-                  }
-                >
-                  {titleize(k)}
-                </button>
-              ))}
-            </div>
+          {pagesOpen && (
+            <>
+              {/* Mobile: tabs + actions */}
+              <div className="sm:hidden mb-3 space-y-3">
+                {/* Tabs (stacked) */}
+                <div className="flex flex-col gap-2">
+                  {pageKeys.map((k) => (
+                    <button
+                      key={k}
+                      onClick={() => handleSelectPage(k)}
+                      className={
+                        "px-3 py-2 rounded-full text-sm border-transparent transition text-left cursor-pointer " +
+                        (active === k
+                          ? "bg-blue-600 text-white border-blue-600 shadow"
+                          : "bg-white hover:bg-blue-50")
+                      }
+                    >
+                      {titleize(k)}
+                    </button>
+                  ))}
+                </div>
 
-            {/* Actions (neat 3-column grid) */}
-            <div className="grid grid-cols-3 gap-2">
-              <ActionsRow reset={reset} logout={logout} />
-            </div>
-          </div>
+                {/* Actions (neat 3-column grid) */}
+                <div className="grid grid-cols-3 gap-2">
+                  <ActionsRow reset={reset} logout={logout} />
+                </div>
+              </div>
 
-          {/* Desktop: tabs left, actions right */}
-          <div className="hidden sm:flex sm:items-center sm:justify-between">
-            <div className="flex gap-2">
-              {pageKeys.map((k) => (
-                <button
-                  key={k}
-                  onClick={() => setActive(k)}
-                  className={
-                    "px-3 py-1.5 rounded-full text-sm border border-transparent transition cursor-pointer " +
-                    (active === k
-                      ? "bg-blue-600 text-white border-blue-600 shadow"
-                      : "bg-white hover:bg-blue-50")
-                  }
-                >
-                  {titleize(k)}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <ActionsRow reset={reset} logout={logout} />
-            </div>
-          </div>
+              {/* Desktop: tabs left, actions right */}
+              <div className="hidden sm:flex sm:items-center sm:justify-between">
+                <div className="flex gap-2">
+                  {pageKeys.map((k) => (
+                    <button
+                      key={k}
+                      onClick={() => handleSelectPage(k)}
+                      className={
+                        "px-3 py-1.5 rounded-full text-sm border border-transparent transition cursor-pointer " +
+                        (active === k
+                          ? "bg-blue-600 text-white border-blue-600 shadow"
+                          : "bg-white hover:bg-blue-50")
+                      }
+                    >
+                      {titleize(k)}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <ActionsRow reset={reset} logout={logout} />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="pt-70 sm:pt-30"></div>
-
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6">
+      <div className="pt-20 sm:pt-30 max-w-7xl mx-auto px-3 sm:px-4 py-6">
         {!ActivePageNode ? (
           <div className="text-gray-600">
             Keine Daten für Seite <b>{active}</b>.
