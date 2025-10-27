@@ -327,13 +327,18 @@ function ServicesFieldFixed({ label, value, onChange }) {
 }
 
 /* ========= Recursive renderer ========= */
-function SectionCard({ title, children }) {
-  const [open, setOpen] = useState(false);
+function SectionCard({ title, children, open: openProp, onToggle }) {
+  // uncontrolled fallback (used by the outer page card)
+  const [internalOpen, setInternalOpen] = useState(false);
+  const controlled = openProp !== undefined;
+  const open = controlled ? openProp : internalOpen;
+  const toggle = controlled ? onToggle : () => setInternalOpen((s) => !s);
+
   return (
     <div className="rounded-2xl border shadow-sm bg-white">
       <button
         type="button"
-        onClick={() => setOpen((s) => !s)}
+        onClick={toggle}
         className="w-full flex items-center justify-between px-4 py-4 md:py-3 rounded-2xl cursor-pointer"
       >
         <span className="text-base md:text-lg font-semibold">{title}</span>
@@ -347,6 +352,9 @@ function SectionCard({ title, children }) {
 }
 
 function FormRenderer({ node, basePath, update }) {
+  // Track which child is open at THIS object level
+  const [openKey, setOpenKey] = useState(null);
+
   // SPECIAL CASE: fixed services array (edit only)
   if (
     Array.isArray(node) &&
@@ -378,7 +386,6 @@ function FormRenderer({ node, basePath, update }) {
           <label className="block text-sm font-medium mb-2">
             {titleize(basePath.split(".").slice(-1)[0])}
           </label>
-          {/* Simple string-array editor */}
           {node.map((v, i) => (
             <TextField
               key={i}
@@ -395,7 +402,6 @@ function FormRenderer({ node, basePath, update }) {
       );
     }
     if (isArrayOfObjects(node)) {
-      // Generic object array — used for logos, etc.
       return (
         <ObjectArrayField
           label={titleize(basePath.split(".").slice(-1)[0])}
@@ -413,15 +419,23 @@ function FormRenderer({ node, basePath, update }) {
         {Object.entries(node).map(([k, v]) => {
           if (k === "__v") return null;
           const path = `${basePath}.${k}`;
+
           if (isObj(v) || Array.isArray(v)) {
+            // Wrap complex children in a controlled SectionCard
             return (
               <div key={k} className="md:col-span-2">
-                <SectionCard title={titleize(k)}>
+                <SectionCard
+                  title={titleize(k)}
+                  open={openKey === k}
+                  onToggle={() => setOpenKey((cur) => (cur === k ? null : k))}
+                >
                   <FormRenderer node={v} basePath={path} update={update} />
                 </SectionCard>
               </div>
             );
           }
+
+          // primitives (strings) render directly
           return (
             <FormRenderer key={k} node={v} basePath={path} update={update} />
           );
@@ -484,7 +498,7 @@ export default function AdminPage() {
       <div className="fixed top-0 left-0 right-0 z-20 backdrop-blur bg-white/80 shadow-sm pb-2">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3">
           <h1
-            className="text-lg sm:text-xl font-semibold mb-3 cursor-pointer select-none"
+            className="text-lg sm:text-xl font-semibold cursor-pointer select-none"
             onClick={() => setPagesOpen((s) => !s)}
             aria-expanded={pagesOpen}
             aria-controls="pages-panel"
@@ -508,7 +522,7 @@ export default function AdminPage() {
           {pagesOpen && (
             <>
               {/* Mobile: tabs + actions */}
-              <div className="sm:hidden mb-3 space-y-3">
+              <div className="sm:hidden my-3 space-y-3">
                 {/* Tabs (stacked) */}
                 <div className="flex flex-col gap-2">
                   {pageKeys.map((k) => (
