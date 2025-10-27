@@ -238,15 +238,20 @@ export function ContentProvider({ children }) {
     (async () => {
       try {
         const { body, version } = await fetchContentFromServer();
-        // sanitize server body (remove legacy fields)
-        const cleanBody = normalizeDeep(body);
+        let cleanBody = normalizeDeep(body);
+
+        // --- MIGRATION: remove deprecated sections ---
+        if (cleanBody?.seiten?.startseite?.kranhersteller) {
+          delete cleanBody.seiten.startseite.kranhersteller;
+        }
+
+        // (you already remove some legacy fields)
         const lb = cleanBody?.seiten?.startseite?.leistungsbereich;
         if (lb) {
           delete lb.abschnittstitel;
           delete lb.abschnittsuntertitel;
         }
 
-        // now diff against defaults
         const initialOverrides = deepDiff(defaults, cleanBody) || {};
         setOverrides(initialOverrides);
         setServerVersion(version);
